@@ -106,6 +106,7 @@ sed 's/d6bf12b6-a4e2-4e77-9694-61e577123456\" >/DHAKA1\" > <logger level=\"INFO\
 ```
 
 
+
 ## Example3: Enable debug for database extension
 ```sh
 # $MULE_HOME an environement variable pointing to Mule4 runtime home.
