@@ -1,0 +1,6 @@
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}

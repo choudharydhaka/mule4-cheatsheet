@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration monitorInterval="60">
+
+    <!--These are some of the loggers you can enable. 
+        There are several more you can find in the documentation. 
+        Besides this log4j configuration, you can also use Java VM environment variables
+        to enable other logs like network (-Djavax.net.debug=ssl or all) and 
+        Garbage Collector (-XX:+PrintGC). These will be append to the console, so you will 
+        see them in the mule_ee.log file. -->
+  
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+           <PatternLayout pattern="%-5p %d [%t] %X{correlationId}%c: %m%n"/>
+        </Console>
+        
+        <Console name="AdvancedJSONConsole" target="SYSTEM_OUT">    
+        <PatternLayout>  
+            <ScriptPatternSelector defaultPattern="{&quot;level&quot;:&quot;%-5p&quot;, &quot;timestamp&quot;:&quot;%d&quot;, &quot;thread&quot;:&quot;%enc{%t}{JSON}&quot;, &quot;class&quot;:&quot;%c&quot;,&quot;log_message&quot;: %replace{%m}{\n}{&#13;}}%n">
+           <Script name="JSONSelector" language="javascript"><![CDATA[
+             var result;
+     if (logEvent.getMessage().getFormattedMessage().charAt(0) != '{') {
+       result = "NotJSON";
+     } else {
+       result = null;
+       result;
+     }]]>
+   </Script>
+    <PatternMatch key="NotJSON" pattern="{&quot;level&quot;:&quot;%-5p&quot;, &quot;timestamp&quot;:&quot;%d&quot;, &quot;thread&quot;:&quot;%enc{%t}{JSON}&quot;, &quot;class&quot;:&quot;%c&quot;,&quot;log_message&quot;: &quot;%replace{%m}{\n}{&#13;}&quot;}%n"/>
+            </ScriptPatternSelector>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        
+        <!-- Http Logger shows wire traffic on DEBUG. -->
+        <!--AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="DEBUG" /-->
+        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="DEBUG" additivity="false" >        
+            <AppenderRef ref="AdvancedJSONConsole" />
+        </AsyncLogger>
+        <AsyncLogger name="org.mule.service.http" level="WARN"/>
+        <AsyncLogger name="org.mule.extension.http" level="WARN"/>
+    
+        <!-- Mule classes -->        
+        <AsyncLogger name="org.mule" level="INFO"/>
+        <AsyncLogger name="com.mulesoft" level="INFO"/>
+        <!-- <AsyncLogger name="org.mule.extension.db" level="DEBUG"/>         -->
+ 
+        <AsyncRoot level="INFO">
+            <AppenderRef ref="Console" />
+        </AsyncRoot>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="dia-standard-munit-test-suite.xml" />
+	
+	<import doc:name="Import" doc:id="14d0e19b-6f36-4ab9-9554-c5fc5b26105c" file="common-api-error-handling-test-suite.xml" doc:description="Imported  common-api-error-handling-test-suite.xml"/>
+	<import doc:name="Import" doc:id="8945c6a6-a9df-4b8c-b499-818ca132b72d" file="common-munit-utilities.xml" />
+	<sub-flow name="munit-logs-assertions-for-500-error" doc:id="de31fc42-409f-4432-9731-a669fc33cf7d" >
+		<munit-tools:assert-that doc:name="Assert LogTarget" doc:id="25a720e4-9d3a-443c-94d0-090b0607d5e9" expression="#[vars.operationalAdditionalLogs.logTarget]" is="#[MunitTools::equalTo('EI Central Log')]" message="logTarget  does not match" />
+		<munit-tools:assert-that doc:name="Assert type" doc:id="99c75125-41d4-4f5b-83a6-10edbe6f7005" expression='#[vars.operationalAdditionalLogs."type"]' is="#[MunitTools::equalTo('ERROR')]" message="Type  does not match" />
+		<munit-tools:assert-that doc:name="Assert timestamp" doc:id="befedd40-5687-4af5-b70a-1cce9be88618" expression="#[vars.operationalAdditionalLogs.timestamp]" is="#[MunitTools::notNullValue()]" message="Type  does not match" />
+		<munit-tools:assert-that doc:name="Assert application name" doc:id="27d6fea1-123a-484e-bfdb-6661a5ceea92" expression="#[vars.operationalAdditionalLogs.application]" is="#[MunitTools::equalTo(p('local.basepath'))]" message="Type  does not match" />
+		<munit-tools:assert-that doc:name="Assert operationName" doc:id="a1f21903-1e26-4148-8fdc-7fa61a5bf7b1" expression="#[vars.operationalAdditionalLogs.operationName]" is="#[MunitTools::notNullValue()]" message="Type  does not match" />
+		<munit-tools:assert-that doc:name="Assert action" doc:id="335595e3-86ed-4642-863a-7f49b7946c5a" expression="#[vars.operationalAdditionalLogs.action]" is="#[MunitTools::equalTo('GET')]" message="Action  does not match" />
+		<munit-tools:assert-that doc:name="Assert clientName" doc:id="fd3b19aa-a0f0-430d-b1c0-3abcdd8beabe" expression="#[vars.operationalAdditionalLogs.clientName]" is="#[MunitTools::equalTo('UnKnown')]" message="clientName must be unknown" />
+		<munit-tools:assert-that doc:name="Assert globalTxnId" doc:id="b3fa3e70-fb65-4e37-a276-62092e4c61b5" expression="#[vars.operationalAdditionalLogs.globalTxnId]" is="#[MunitTools::notNullValue()]" message="globalTxnId should not be null" />
+		<munit-tools:assert-that doc:name="Assert correlationId" doc:id="d03fc49c-ee62-4685-8407-438e0f48cb6b" expression="#[vars.operationalAdditionalLogs.correlationId]" is="#[MunitTools::notNullValue()]" message="correlationId should not be null" />
+		<munit-tools:assert-that doc:name="Assert resultCode" doc:id="eb44f862-3a0d-4942-8771-d946cb32a3b8" expression="#[vars.operationalAdditionalLogs.resultCode]" is="#[MunitTools::equalTo('500')]" message="resultCode must be 400" />
+		<munit-tools:assert-that doc:name="Assert errorCode" doc:id="68e74791-5d1d-4919-bd0e-cd3a2afca29a" expression="#[vars.operationalAdditionalLogs.errorCode]" is="#[MunitTools::equalTo('INTERNAL_SERVER_ERROR')]" message="errorCode must be unknown" />
+		<munit-tools:assert-that doc:name="Assert errorDetail" doc:id="370cf40d-55a6-41d1-8d27-2cd84548751b" expression="#[vars.operationalAdditionalLogs.errorDetail]" is="#[MunitTools::equalTo('Internal server error')]" message="errorDetail must be Bad request" />
+		<munit-tools:assert-that doc:name="Assert errorDescription" doc:id="278cad69-3e6c-4ac6-aaf6-fc0beec5e4f8" expression="#[vars.operationalAdditionalLogs.payloadCollection.errorDescription]" is="#[MunitTools::notNullValue()]" message="errorDescription must not be null" />
+		<munit-tools:assert-that doc:name="Assert requestId" doc:id="4a99e2e2-9dae-49fc-8432-f1217b12cf03" expression="#[vars.operationalAdditionalLogs.requestId]" is="#[MunitTools::notNullValue()]" message="requestId should not be null" />
+		<munit-tools:assert-that doc:name="Assert requestId" doc:id="3e3fd5b5-08be-4822-a292-7515f9f8c132" expression="#[vars.operationalAdditionalLogs.parentRequestId]" is="#[MunitTools::notNullValue()]" message="parentRequestId should not be null" />
+	</sub-flow>
+	
+	<sub-flow name="munit-logs-assertions-for-successful-scenario" doc:id="315babf9-877c-474e-ae2c-b7a05ca5940f">
+		<munit-tools:assert-that doc:name="Assert LogTarget" doc:id="a7f6e57d-de60-461b-a4b5-914a4b2cbde4" expression="#[vars.operationalAdditionalLogs.logTarget]" is="#[MunitTools::equalTo('EI Central Log')]" message="logTarget  does not match" />
+		<munit-tools:assert-that doc:name="Assert Log Type" doc:id="e9316bf7-5666-476e-a4eb-ab7314a36eed" expression='#[vars.operationalAdditionalLogs."type"]' is="#[MunitTools::equalTo('API_RESPONSE')]" message="Type  does not match" />
+		<munit-tools:assert-that doc:name="Assert timestamp" doc:id="9d5883fe-6431-4ac1-aa20-09e94b2c78b9" expression="#[vars.operationalAdditionalLogs.timestamp]" is="#[MunitTools::notNullValue()]" message="Timestamp should not null" />
+		<munit-tools:assert-that doc:name="Assert Operation Name" doc:id="715eb75a-a090-4a66-ae70-98ff8e5a7a5a" expression="#[vars.operationalAdditionalLogs.operationName]" is="#[MunitTools::notNullValue()]" message="Make sure operationName is set properly" />
+		<munit-tools:assert-that doc:name="Assert targetApplication" doc:id="62b16929-2ce9-489f-b2d6-3b7b0780f786" expression="#[vars.operationalAdditionalLogs.targetApplication]" is="#[MunitTools::notNullValue()]"/>
+		<munit-tools:assert-that doc:name="Assert targetAction" doc:id="0346820f-e577-4c61-9a83-024a3a65b448" expression="#[vars.operationalAdditionalLogs.targetAction]" is="#[MunitTools::notNullValue()]"/>
+	</sub-flow>
+	<sub-flow name="munit-decode-jwt-token" doc:id="72ea502f-1768-4d76-9ddb-8852f4d8425c" >
+		<choice doc:name="Choice" doc:id="01d06b43-ecb0-4f28-91fe-e5354641dc35" >
+			<when expression='#[(attributes.headers."x-txn-identifiers" != null)]'>
+				<set-variable value="true" doc:name="Set jwt_tocken_exists to true" doc:id="e6666af5-53ef-49c3-812a-e5d40d92270b" variableName="jwt_tocken_exists"/>
+				
+				<ee:transform doc:name="Read and Decode JWT Token" doc:id="6c928328-daf0-4a0a-b2ad-cadfe31a101d" >
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="jwtToken" ><![CDATA[%dw 2.0
+import * from dw::core::Binaries
+output application/json
+---
+read(fromBase64(attributes.headers.'x-txn-identifers'),"application/json")	
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<set-variable value="false" doc:name="Set jwt_tocken_exists to false" doc:id="0be09083-041d-4ae3-8adf-508728043386" variableName="jwt_tocken_exists"/>
+			</otherwise>
+		</choice>		
+	</sub-flow>
+	<sub-flow name="munit-jwt-assertions-subflow" doc:id="2cf8b1fb-7017-4764-8fcc-ed48080d73cf" >
+		<choice doc:name="Choice" doc:id="d7b44e11-a78b-4d12-8063-4af22b902f2b" >
+			<when expression="#[vars.jwt_tocken_exists==true]">
+				<munit-tools:assert-that doc:name="Assert that Global Transaction ID Matches" doc:id="6f99bbdc-95c1-4a2d-bb9d-2bcbe72d8050" expression="#[vars.jwtToken.globalTxnId]" is='#[MunitTools::equalTo("7fe64d84-e23d-de56-9033-ab35a0589b66")]' message="Global Transaction Id Does not Match"/>
+				<munit-tools:assert-that doc:name="Assert that Client Name Matches" doc:id="16bd17bd-cd27-44b5-961f-618ddd4f03fa" expression="#[vars.jwtToken.clientName]" is='#[MunitTools::equalTo("CCMS Test234")]' message="Client Name Does not Match"/>
+				<munit-tools:assert-that doc:name="Assert that Request ID Matches" doc:id="8e16f463-354c-4447-9d84-4069ad198959" expression="#[vars.jwtToken.requestId]" is='#[MunitTools::equalTo("553e3d25-f2cd-4d43-8893-a985a0789a55")]' message="request ID Does not Match"/>
+			</when>
+			<otherwise >
+				<munit-tools:assert-that doc:name="Assert that Client Name Maches" doc:id="bce6747d-1d3b-41a1-8a81-9e5893fcadf0" expression="#[vars.jwtObject.clientName]" is='#[MunitTools::equalTo("UnKnown")]' message="Default Client  ID Does not Match"/>
+				<munit-tools:assert-that doc:name="Assert that Global Transaction ID Matches" doc:id="73d9b5b8-a039-4f13-985d-1a65309720db" expression="#[vars.jwtObject.globalTxnId]" is="#[MunitTools::notNullValue()]" message="Global Transaction is NULL"/>
+				<munit-tools:assert-that doc:name="Assert that Request ID Matches" doc:id="1c8a6345-9c28-4052-a4d5-d0d45db8d8d8" expression="#[vars.jwtObject.requestId]" is="#[MunitTools::notNullValue()]" message="request ID is NULL"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="munit-spy-request-jwt-token" doc:id="ab25240a-5851-4d7e-a6ea-855e97dd6469" >
+		<munit-tools:spy doc:name="Spy" doc:id="88ac8946-9f24-42b7-9b62-182bcd92ee75" processor="apikit:router">
+			<munit-tools:with-attributes >
+			</munit-tools:with-attributes>
+			<munit-tools:before-call>				
+				<flow-ref doc:name="Flow Reference to Decode JWT" doc:id="e8e23d40-b319-472a-b1e9-8787ecf1e4b6" name="munit-decode-jwt-token"/>
+			</munit-tools:before-call>
+			<munit-tools:after-call >
+				<flow-ref doc:name="Flow Reference to JWT Assertions" doc:id="d650761c-de3e-47bc-b3e9-b5196c8a8b7c" name="munit-jwt-assertions-subflow"/>
+			</munit-tools:after-call>
+		</munit-tools:spy>
+	</sub-flow>
+		
+</mule>

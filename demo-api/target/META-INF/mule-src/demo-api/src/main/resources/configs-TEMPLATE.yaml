@@ -1,0 +1,17 @@
+api:
+    application_name: "demo-api"
+    version: "$API_VERSION"
+    auto_discovery_id: "$APIM_AUTO_DISCOVERY_ID"
+    releaseVersion: "$API_RELEASE_VERSION"
+
+local:
+    host: "0.0.0.0"
+    port: "8081"
+    basepath: "demo-api"
+    tls-port: "8082"
+    tls-keystore: "/opt/mule/security/mule.jks"
+    tls-keystore-password: "![secure::$MULE_TLS_KEYSTORE_SECRET]"
+    tls-server-cert: "$MULE_SERVER_CERT_ALIAS"
+    tls-sever-cert-password: "![secure::$MULE_ALIAS_SERVER_CERT_SECRET]"
+    tls-trust-keystore: "/opt/mule/security/mule-trust.jks"
+    tls-trust-keystore-password: "![secure::$MULE_TLS_KEYSTORE_SECRET]"

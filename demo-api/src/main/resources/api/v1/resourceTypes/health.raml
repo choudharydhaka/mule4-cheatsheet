@@ -1,0 +1,12 @@
+#%RAML 1.0 ResourceType
+
+usage: This is health resource response.
+
+get:
+  description: This is successful response.
+  responses:
+    200:
+      body:
+        application/json:
+          type: !include ../dataTypes/health.raml
+          example: !include ../examples/health-get-response.json

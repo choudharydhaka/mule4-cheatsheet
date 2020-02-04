@@ -1,0 +1,8 @@
+#%RAML 1.0 DocumentationItem
+title: Marriages Process API
+content: |
+  This API will be used to interact with the Marriage database (through iDAL SYS API). As per the requirement for SVC implementation, it will be having one resource to retrieve marriage registration details for a given marriage registration number. However, this API will/can be extended later to provide more functionality.
+
+  **Note:** 
+  - In the future POST will be used for retrieval requests against new registers, as they require information about the requesting party to be passed in the message body. In the future this will be recorded in SADB. 
+  - Also passing data in the body of a GET message is not guaranteed to be supported by all clients.  
