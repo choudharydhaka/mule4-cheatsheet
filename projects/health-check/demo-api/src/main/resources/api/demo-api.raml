@@ -1,0 +1,16 @@
+#%RAML 1.0
+
+title: demo-api
+documentation:
+ - !include documentations/demo-api.raml
+description: This API is to demostrate and understand cheatseat API.
+version: v1
+baseUri: https://{environment}.dhaks.localhost.nip.io/demo-api/{version}/
+mediaType: application/json
+protocols: [HTTPS]
+
+resourceTypes:
+  health: !include ./resourceTypes/health.raml
+
+/health:
+  type: health
