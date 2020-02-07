@@ -1,6 +1,6 @@
 # Introduction
 
-This project repository defines basic steps for defining API specification using API Workbench (without Anypoint design center) and then develop the API using Anypoint Studio. 
+This project repository defines basic steps for designing API specification using API Workbench (without Anypoint design center) and then develop the API using Anypoint Studio. 
 
 # Prerequisite
 Below mentioned tools must be installed in your development machine: 
