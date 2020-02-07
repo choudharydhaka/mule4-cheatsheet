@@ -28,6 +28,9 @@ This section requires to be implemented on eithor Anypoint Design Center or API 
 ![](/.attachments/demo-raml-structure.PNG)
 
 We will use modular approach for maximum reusability of all the raml fragements. We should create diffrent directory sturcture for all the specific raml type. 
+
+### RAML directory structure
+
 |Name|Description|
 |-----------|----------------------------------|
 |dataTypes|This section contains all the data types for any request/response of the API and refer them from main API or resourceTypes raml defination|
@@ -35,6 +38,7 @@ We will use modular approach for maximum reusability of all the raml fragements.
 |resourceTypes| Every resource defination should be created under this section and then refer them from main API raml definition|
 |traits|These are the like small function and allows security restriction/requests/responses/headers, we want to add on the API resource|
 |libraries|These are the collection of traits/resourceTyps/dataTypes, which then can be refers for grouped functionality|
+|documentation| We should define the documentation here as DocumentItem, RAML supports Mark Down inside content.|
 |demo-api.raml|This is main RAML definition where we refer all the resourceTypes/dataTypes/examples/traits/libraries| 
 
 Following the above best practises, I've created the demo-api specification which is stored under ```demo-api/src/main/resources/api``` for reference.
