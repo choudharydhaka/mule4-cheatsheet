@@ -266,3 +266,40 @@
 }
 ```
 
+### Mermaid for Azure DevOps
+
+```mermaid
+
+::: mermaid
+
+sequenceDiagram
+    participant Client as API Client
+    participant Proc as Demo Proc API
+    participant Sys as Demo Sys API 
+    participant db as Demo Database
+
+    Client->>+Proc: GET /addresses/{pincode}
+
+    alt Validation passed
+	Proc ->> +Sys: [GET] /addresses/{pincode}
+	alt Validation passed
+	    Sys ->>+Register: [dbo].[Addresses] Stroed Proc
+	    alt Validation passed
+
+	        Register-->>-Sys: Address records result set
+
+	    else Error
+	        Register-->>-Sys: Error response
+	    end
+           Sys-->>Proc: Address Object JSON Response 
+	else Error
+	    Sys -->>-Proc: Error Object JSON response
+        end
+
+        Proc -->>Client : Address JSON response
+    else Error
+        Proc -->>Client : Error JSON response
+    end
+
+:::
+```
