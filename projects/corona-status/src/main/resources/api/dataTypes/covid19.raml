@@ -1,0 +1,42 @@
+#%RAML 1.0 DataType
+
+description: Covid-19 status.
+type: array
+items:
+  country:
+    type: string
+    description: Country.
+    example: New Zealand
+  province:
+    type: string
+    description: province
+    example: Hubei
+  countryCode:
+    type: string
+    description: countryCode.
+    example: NZ
+  confirmed:
+    type: number
+    description: confirmed number cases.
+    example: 10
+  recovered:
+    type: number
+    description: recovered number cases.
+    example: 20
+  deaths:
+    type: number
+    description: Number of deaths.
+    example: 400
+  confirmedByDay:
+    type: array
+    items: number
+  deathsByDay:
+    type: array
+    items: number
+  recoveredByDay:
+    type: array
+    items: number
+  lastUpdated: datetime
+  mortalityPer: string
+  recoveredPer: string  
+  active: number

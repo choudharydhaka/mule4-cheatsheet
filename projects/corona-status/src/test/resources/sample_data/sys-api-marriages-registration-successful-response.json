@@ -1,0 +1,35 @@
+[{   
+  "marriageRegistrationNumber": "2019/454",
+  "personCurrentSurname": "WILLIAMS",
+  "personCurrentFirstNames": "SALLY JANE",
+  "spouseSurname": "SARAHA",
+"spouseFirstNames": "NEIGHBOUR",
+  "dateOfBirth": "1995-10-20",
+"placeOfMarriage": "Nelson Botanical Gardens",
+  "dateOfMarriage": "2019-07-11",
+  "recordType": "S",
+  "amendCode1": "1",
+  "amendCode2": "3",
+  "amendCode3": "5",
+  "folioNumber": "AB/67/67/67",
+  "dateLastModified": "2010-10-20",
+  "recordClosedIndicator": "N"
+},
+{   
+  "marriageRegistrationNumber": "2019/454",
+  "personCurrentSurname": "SARAHA",
+  "personCurrentFirstNames": "NEIGHBOUR",
+  "spouseSurname": "WILLIAMS",
+"spouseFirstNames": "SALLY JANE",
+  "dateOfBirth": "1995-10-20",
+"placeOfMarriage": "Nelson Botanical Gardens",
+  "dateOfMarriage": "2019-07-11",
+  "recordType": "S",
+  "amendCode1": "1",
+  "amendCode2": "3",
+  "amendCode3": "5",
+  "folioNumber": "AB/67/67/68",
+  "dateLastModified": "2010-10-20",
+  "recordClosedIndicator": "N"
+}
+]

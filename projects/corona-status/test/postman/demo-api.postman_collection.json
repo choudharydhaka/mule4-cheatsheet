@@ -1,0 +1,21 @@
+{
+	"info": {
+		"_postman_id": "4bbe518f-0af0-43e6-8ee8-e5420e24048a",
+		"name": "demo-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
