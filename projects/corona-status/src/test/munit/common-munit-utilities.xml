@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="ei-idal-sys-munit-common.xml" />
+	
+	<http:request-config name="munit-https-request-configuration" doc:name="HTTP Request configuration" doc:id="f89c689a-5162-48a8-b2ce-9922876adcac" basePath="/${local.basepath}" >
+		<http:request-connection host="${local.host}" port="${local.tls-port}" protocol="HTTPS">
+			<tls:context>
+				<tls:trust-store path="${marriages-sys.tls-trust-keystore}" password="${secure::marriages-sys.tls-trust-keystore-password}" type="jks"/>
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="munit-http-request-configuration" doc:name="HTTP Request configuration" doc:id="6016fc7b-a8a0-4a89-90bc-5c53386d0980" basePath="/${local.basepath}" >
+		<http:request-connection host="${local.host}" port="${local.port}"/>
+	</http:request-config>
+	
+	<sub-flow name="set-idal-sys-api-header-variable-sub-flow" doc:id="ea2d1be2-f07f-4d1a-ae04-43c000628522" >
+		<ee:transform doc:name="Read iDAL SYS API Header" doc:id="06549ca3-a8db-42cf-9d85-309cf5d67960" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="systemApiHeader" ><![CDATA[%dw 2.0
+output application/json
+---
+readUrl('classpath://sample_data/system-api-header.json', 'application/json')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="munit-common-sucessful-request" doc:id="e5a10360-2115-450b-97ed-cf398b5a2b0f" >
+		<flow-ref doc:name="Invoke Munit Successful  Request" doc:id="443d821d-ca20-4c1c-9314-99af2c7f7f71" name="munit-successful-request"/>
+		<ee:transform doc:name="Set centerlizedMonitoringLoggingObject" doc:id="ab772548-a127-4c0a-9093-dc154ed186be">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="centerlizedMonitoringLoggingObject"><![CDATA[%dw 2.0
+import modules::commonUtils
+output application/json
+---
+{	
+	clientName: vars.jwtObject.clientName,
+	globalTxnId: vars.jwtObject.globalTxnId,
+	correlationId:  vars.jwtObject.correlationId,
+	parentRequestID: vars.jwtObject.requestId,
+	logTarget: commonUtils::LOG_TARGET_EI_CENTRALLOG,
+	timestamp: now()  as LocalDateTime as String {format : "yyyy:MM:dd HH:mm:ss,SSS"},
+	"type": commonUtils::PAYLOAD_TYPE_API_REQUEST,
+	category: commonUtils::CATEGORY_COMMUNICATIONS,
+	payloadSize: attributes.headers.'content-length',
+	application: p('application_name') default "TODO ei-common-project",
+	operationName: attributes.requestPath default "TODO requestPath",
+	action: attributes.method default "TODO method",
+	payloadCollection: [
+		{
+			payloadType: commonUtils::PAYLOAD_TYPE_API_REQUEST,
+			payloadSize: attributes.headers.'content-length',
+			payloadData: payload
+		}
+
+	] 
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Initialize payloadCollection" doc:id="4f0cc8c6-8c64-478f-8f55-8fd682cde561">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="payloadCollectionObject"><![CDATA[%dw 2.0
+output application/json
+import modules::commonUtils
+---
+{
+	payloadCollection : [{ 
+	payloadType: commonUtils::PAYLOAD_TYPE_API_REQUEST,
+	(payloadSize: attributes.headers.'content-length') if (attributes.headers.'content-length' != null),
+		payloadData: {
+	 		"registrationNumber" : vars.registrationNumber
+		}
+	}]
+}	
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

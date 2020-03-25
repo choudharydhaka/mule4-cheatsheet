@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="common-api-error-handling-test-suite.xml" />
+	
+	<import doc:name="Import" doc:id="24da7ee5-19a7-4ab0-b8cc-0c16568260fd" doc:description="Imported common-munit-utilities.xml" file="common-munit-utilities.xml" />
+	<sub-flow name="munit-get-request-variables-sub-flow" doc:id="7d5b93aa-2c82-4de8-b5e3-1e1d2789b9e6" >
+		<set-variable value="GET" doc:name="Set Variable testHttpMethod" doc:id="ce0c3766-0578-46a1-9af2-d6af526ec80a" variableName="testHttpMethod" />
+		<set-variable value="/${api.version}/register/{registrationNumber}" doc:name="Set Variable testHttpRequestPath" doc:id="c120502f-1f74-44a7-8115-fb9ee2e07f13" variableName="testHttpRequestPath" />
+	</sub-flow>
+	
+	<sub-flow name="munit-successful-request" doc:id="a8b8aacc-94fd-4841-81f3-03a747397918" >
+		<ee:transform doc:name="Transform Message for Setting Successful Request" doc:id="312962b7-83ae-47d9-99ee-6387879912f6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+readUrl('classpath://sample_data/sys-api-marriages-registration-successful-response.json', 'application/json')]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="munit-400-bad-request-behaviour-sub-flow" doc:id="a05f8fef-f48c-4ab4-900f-d90c4e884535" >
+		<munit-tools:mock-when doc:name="Mock when APIKit Router throws ANY Error" doc:id="da3e8f66-1ca1-4338-bc66-151fe68f6ae4" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+		</munit-tools:mock-when>
+	</sub-flow>
+	<sub-flow name="munit-404-not-found-behaviour" doc:id="f11955e5-7510-4403-8d34-4a977b62a80f">
+		<set-variable value="GET" doc:name="Set Variable testHttpMethod" doc:id="ec75ff8e-34b9-4d1a-b3f4-25ad504f6ca2" variableName="testHttpMethod" />
+		<set-variable value="/v1/replicate-non-found-error" doc:name="Set Variable testHttpRequestPath" doc:id="a45db8a5-d4cc-43d3-9448-78328e857937" variableName="testHttpRequestPath" />
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_FOUND_ERROR" doc:id="d1375507-91b2-4794-b26a-2db6e2911cd7" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="ei-marriages-proc-api-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:NOT_FOUND']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>
+	</sub-flow>
+
+	
+	<sub-flow name="munit-405-method-not-allowed-behaviour" doc:id="b0f4e778-d5a8-4029-80ab-1e06faef7113">
+		<set-variable value="DELETE" doc:name="Set Variable testHttpMethod" doc:id="630f29c3-0d06-4750-8b88-59787207e164" variableName="testHttpMethod"/>
+		<set-variable value="/v1/register/12323" doc:name="Set Variable testHttpRequestPath" doc:id="c7264a6b-9e94-4a26-ae4c-0c8261770798" variableName="testHttpRequestPath"/>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_FOUND_ERROR" doc:id="705a67b3-3f82-49e5-80a8-800a2769a0c4" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="ei-marriages-proc-api-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:METHOD_NOT_ALLOWED']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	<sub-flow name="munit-406-not-acceptable-behaviour" doc:id="2532cc86-1158-4d3c-952f-6b4048d65a12">
+		<flow-ref doc:name="Flow Reference to Set HTTP Method and Resource Name" doc:id="56730ae8-f98c-4cfa-b1a1-92253ded58a9" name="munit-get-request-variables-sub-flow" />	
+	</sub-flow>
+	
+	<sub-flow name="munit-415-unsupported-media-type-behaviour-sub-flow" doc:id="45ea9fbd-ecce-4ad3-ab81-8dea16fd5dca">
+		<flow-ref doc:name="Flow Reference to Set HTTP Method and Resource Name" doc:id="9f38bfb9-bf3a-4462-9acd-e014a486b3a8" name="munit-get-request-variables-sub-flow" />
+		<munit-tools:mock-when doc:name="Mock when APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="c44d9eea-5c54-4826-84c9-b1272d5aa399" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="ei-marriages-proc-api-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:UNSUPPORTED_MEDIA_TYPE']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>
+	</sub-flow>
+	<sub-flow name="munit-dia-500-internal-server-error-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+		<set-variable value="GET" doc:name="Set Variable testHttpMethod" doc:id="60dcb05e-70d7-4f50-b33c-9fcf7b42fed8" variableName="testHttpMethod"/>
+		<set-variable value="/v1/register/12323" doc:name="Set Variable testHttpRequestPath" doc:id="0240baaf-05e6-4f94-b08f-313f918d62b1" variableName="testHttpRequestPath"/>
+		<munit-tools:mock-when doc:name="Mock when DIA:500_INTERNAL_SERVER_ERROR" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="ei-marriages-proc-api-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['DIA:500_INTERNAL_SERVER_ERROR']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	<sub-flow name="munit-501-not-implemented-behaviour-sub-flow" doc:id="489c8fcb-a21a-4718-9b9a-bc932cd888f2">
+		<set-variable value="GET" doc:name="Set Variable testHttpMethod" doc:id="75b2fdc2-2489-457b-a7b2-85fab73ce9c6" variableName="testHttpMethod"/>
+		<set-variable value="/v1/register/12323" doc:name="Set Variable testHttpRequestPath" doc:id="9abea741-7653-4981-ab95-d7cada9c1946" variableName="testHttpRequestPath"/>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_IMPLEMENTED" doc:id="9c6cd51c-e069-4778-90b9-dde687e07e9c" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="ei-marriages-proc-api-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:NOT_IMPLEMENTED']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	<sub-flow name="munit-any-error-behaviour" doc:id="f2a95f7b-6395-4780-947e-31d1861b9f1a">
+		<flow-ref doc:name="Flow Reference to Set HTTP Method and Resource Name" doc:id="f12190c1-4e5d-4af7-8995-29de341d4c3f" name="munit-get-request-variables-sub-flow" />
+		<flow-ref doc:name="Set Payload For Transaction" doc:id="c4bc0c12-2d46-4bdb-88e7-7a48d258ac20" name="munit-common-sucessful-request"/>
+	</sub-flow>
+</mule>

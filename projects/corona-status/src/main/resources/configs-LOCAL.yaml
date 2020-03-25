@@ -1,0 +1,3 @@
+covid:
+  host: "https://corona-stats.online"
+  port: "443"

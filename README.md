@@ -1,8 +1,14 @@
-# mule4-cheatseat
+# Mule4 cheatsheet
 This repository for users to help themselves for Mule4 projects.
 
-# Design API with Workbench
-Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.
+# Mule projects
+Here you can find the projects which has an example API running with concepts in details.
+
+|Project|Description|Links|
+|-|-|-|
+|Design API with Workbench| Workbench an Atom editor plugin allows us to design RAML specification |Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.|
+|How to use secure properties| Mule allows to encrypt any secrets|Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/secure-property)
+
 
 # TLS with Mule4
 TLS allows to secure API's with Mule4. 
@@ -116,6 +122,46 @@ cd $MULE_HOME/apps/demo-api/
 sed 's/<\/Loggers/<AsyncLogger name=\"org.mule.extension.db\" level=\"DEBUG\" \/> <\/Loggers/' log4j2.xml
 
 ```
+
+## Custom Security Policy
+Mule4 allows to apply security policies using Anypoint API Manager, Mule4 runtime has an embeded API gateway component to intercept the requests/responses and enforces the policies on them. Sometimes we need to create some custom policies to meet an out of the box business requirement. 
+
+### Create a project using Maven archtype
+MuleSoft provides an Maven compatible to generate template artifects to starts with. You must have some of the key values before hands to pass on to ```mvn`` command as arguments.
+
+
+```sh
+mvn -Parchetype-repository archetype:generate \
+-DarchetypeGroupId=org.mule.tools \
+-DarchetypeArtifactId=api-gateway-custom-policy-archetype \
+-DarchetypeVersion=1.1.0 \
+-DgroupId=${orgId} \
+-DartifactId=${policyName} \
+-Dversion=1.0.0-SNAPSHOT \
+-Dpackage=mule-policy
+
+```
+If you might have noticed couple of variables( ```$orgId``` and ```${policyName}``` ) you will need to provide when you will issue the command.
+
+|Argument  | Description|
+|-----|---------|
+|orgId| This is an organization Id provided by MuleSoft against your created organisation, Please check Access Management -> Organization -> Click on the org Name -> Organization Id, example: 123456789-2345-6789-12-3456789-887777 |
+|policyName| Name of the policy, exmple gw-http-custom-policy|
+
+
+```
+mvn -Parchetype-repository archetype:generate -DarchetypeGroupId=org.mule.tools -DarchetypeArtifactId=api-gateway-custom-policy-archetype -DarchetypeVersion=1.1.0 -DgroupId=123456789-2345-6789-12-3456789-887777 -DartifactId=gw-http-custom-policy -Dversion=1.0.0 -Dpackage=mule-policy
+```
+
+![](/.attachments/aam-orgid.PNG)
+
+You can find above example [here](https://docs.mulesoft.com/api-manager/2.x/custom-policy-getting-started) on MuleSoft website. 
+
+
+
+once the API is up and running.
+
+ You have applied the policy
 
 ## Dataweave 2.0
 

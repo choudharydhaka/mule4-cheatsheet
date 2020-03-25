@@ -1,0 +1,11 @@
+#%RAML 1.0 ResourceType
+
+usage: This is get covid-19 status.
+
+get:
+  responses:
+    200:
+      body:
+        application/json:
+          type: !include ../dataTypes/covid19.raml
+          example: !include ../examples/covid19-get-response.json

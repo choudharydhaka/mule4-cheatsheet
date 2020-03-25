@@ -1,0 +1,16 @@
+#%RAML 1.0
+
+title: corona-status-api
+documentation:
+ - !include documentations/corona-api.raml
+description: This API is to track covid-19 world wide.
+version: v1
+baseUri: https://{environment}.dhaks.localhost.nip.io/corona-status-api/{version}/
+mediaType: application/json
+protocols: [HTTPS]
+
+resourceTypes:
+  covid19: !include ./resourceTypes/covid19.raml
+
+/covid19:
+  type: covid19
