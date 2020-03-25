@@ -1,8 +1,14 @@
-# mule4-cheatseat
+# Mule4 cheatsheet
 This repository for users to help themselves for Mule4 projects.
 
-# Design API with Workbench
-Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.
+# Mule projects
+Here you can find the projects which has an example API running with concepts in details.
+
+|Project|Description|Links|
+|-|-|-|
+|Design API with Workbench| Workbench an Atom editor plugin allows us to design RAML specification |Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.|
+|How to use secure properties| Mule allows to encrypt any secrets|Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/secure-property)
+
 
 # TLS with Mule4
 TLS allows to secure API's with Mule4. 
