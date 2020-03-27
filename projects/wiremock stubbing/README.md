@@ -1,3 +1,21 @@
+- [URL matching](#url-matching)
+- [Exact path matching](#exact-path-matching)
+- [Request header matching](#request-header-matching)
+- [Query parameter matching](#query-parameter-matching)
+- [Request body matching](#request-body-matching)
+- [JSON body matching](#json-body-matching)
+- [Query parameter matching](#query-parameter-matching-1)
+- [Request body matching](#request-body-matching-1)
+- [XML body matching](#xml-body-matching)
+- [Sending response header](#sending-response-header)
+- [Specifying the response body](#specifying-the-response-body)
+- [base64Body](#base64body)
+  * [Mermaid for Azure DevOps](#mermaid-for-azure-devops)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
+
 ## URL matching
 ```
 {
