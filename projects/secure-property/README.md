@@ -1,3 +1,19 @@
+- [Introduction](#introduction)
+- [Prerequisite](#prerequisite)
+- [Requirement](#requirement)
+- [How to encrypt a string in Mule4 using Secure property tool](#how-to-encrypt-a-string-in-mule4-using-secure-property-tool)
+  * [Download Secure property tools](#download-secure-property-tools)
+  * [Encrypt a string text value](#encrypt-a-string-text-value)
+      - [Output](#output)
+- [How to use secure module in the project](#how-to-use-secure-module-in-the-project)
+  * [install Extension Module in Studio](#install-extension-module-in-studio)
+  * [Use module in global configuration](#use-module-in-global-configuration)
+  * [Supply encrypted text values in configs-LOCAL.yaml file](#supply-encrypted-text-values-in-configs-localyaml-file)
+    + [**configs-LOCAL.yaml**](#--configs-localyaml--)
+    + [**get-health-implementation.xml**](#--get-health-implementationxml--)
+- [API Development](#api-development)
+  * [Run the Secure Property API](#run-the-secure-property-api)
+
 # Introduction
 
 This project repository defines basic steps to create a secure property value using Secure property tools jar file provided by MuleSoft.
