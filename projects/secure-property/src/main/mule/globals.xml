@@ -9,9 +9,12 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
 	<apikit:config name="secure-property-config" api="secure-property.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     
-	<http:listener-config name="API_HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bd277567-317b-4b6b-b6e5-7f4b1d274f7a" basePath="/secure-property-api" >
-		<http:listener-connection host="localhost" port="8081" />
+	<http:listener-config name="API_HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bd277567-317b-4b6b-b6e5-7f4b1d274f7a" basePath="${local.basepath}" >
+		<http:listener-connection host="${local.host}" port="${local.port}" />
 	</http:listener-config>
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="81f4bd19-e4c6-4d6a-a687-006e723edd81" file="./configs-LOCAL.yaml" key="${API_MASTER_KEY}" />
-	<configuration-properties doc:name="Configuration properties" doc:id="4931b3f8-1dc6-48fc-b711-3d9fb05e43b0" file="configs-LOCAL.yaml" /> 
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="81f4bd19-e4c6-4d6a-a687-006e723edd81" file="./configs-LOCAL.yaml" key="healthResponsed4" />
+	<configuration-properties doc:name="Configuration properties" doc:id="4931b3f8-1dc6-48fc-b711-3d9fb05e43b0" file="configs-LOCAL.yaml" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="686a9a45-a79c-4588-9ae7-2716e9cb0693" basePath="${downstream.basepath}/${downstream.version}" >
+		<http:request-connection host="${downstream.host}" port="${downstream.port}" />
+	</http:request-config> 
 </mule>
