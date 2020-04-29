@@ -1,0 +1,417 @@
+{
+	"info": {
+		"_postman_id": "d62071bf-abfe-4103-9c2c-c4dc14b848e5",
+		"name": "Keycloak",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Realm",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/auth/realms/master/.well-known/openid-configuration",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						".well-known",
+						"openid-configuration"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authorization",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/auth/realms/master/protocol/openid-connect/auth?scope=openid&client_id=dev-realm&response_type=code&redirect_uri=http://localhost/oidc/callback",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"auth"
+					],
+					"query": [
+						{
+							"key": "scope",
+							"value": "openid"
+						},
+						{
+							"key": "client_id",
+							"value": "dev-realm"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost/oidc/callback"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access Token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic bXVsZS11c2VyOjhhMjc4ZDZkLTRjZDMtNDQ1Ny1hZDRhLWZmODRkYTBmMzI5Yw",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "mule-app",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://localhost:9082/oauth/callback",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "5e750294-b7e4-463f-a6db-2765e6b81b72.62cabe1a-146f-454a-8759-cdba82b8c743.2a83774d-c696-451e-bfa9-2acd286b8fad",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "c9fb0ced-b68d-4abf-b533-2c2745a28858",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/auth/realms/master/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token with Password grant",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic bXVsZS11c2VyOjhhMjc4ZDZkLTRjZDMtNDQ1Ny1hZDRhLWZmODRkYTBmMzI5Yw",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "mule-client-01",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://localhost:9082/oauth/callback",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "bdf2d144-5e2b-4e70-84ce-25d9c7309b51.d6f9131e-e4e7-49ac-882b-fe69b274f750.e43f1fca-91e1-43fc-a152-1f76aa614854",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "2e6229f4-5643-4bc1-b988-72bf26a8889b",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "mule-user",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/auth/realms/master/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access Token Mule-client-01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "99f3c9f5-6585-4215-9b78-54ecef9fc04f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Content-Type is JSON\", function () {",
+							"    pm.response.to.be.json;",
+							"})",
+							"",
+							"let jsonResponse = pm.response.json();",
+							" ",
+							"",
+							"postman.setEnvironmentVariable(\"TOKEN\",jsonResponse.access_token );"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic bXVsZS11c2VyOjhhMjc4ZDZkLTRjZDMtNDQ1Ny1hZDRhLWZmODRkYTBmMzI5Yw",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "mule-client-01",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "c9fb0ced-b68d-4abf-b533-2c2745a28858",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://localhost:9082/oauth/callback",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "5e750294-b7e4-463f-a6db-2765e6b81b72.62cabe1a-146f-454a-8759-cdba82b8c743.2a83774d-c696-451e-bfa9-2acd286b8fad",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "mule-user-01",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "address",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/auth/realms/master/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access Token Mule-client-01 Introspect",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7254a19e-98a1-4423-89a8-0bd4c15cbd37",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "691141e9-27d8-4c4b-9b6e-3a36f76b3f20",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "2e6229f4-5643-4bc1-b988-72bf26a8889b",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "mule-client-01",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic bXVsZS11c2VyOjhhMjc4ZDZkLTRjZDMtNDQ1Ny1hZDRhLWZmODRkYTBmMzI5Yw",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/auth/realms/master/protocol/openid-connect/token/introspect",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token",
+						"introspect"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

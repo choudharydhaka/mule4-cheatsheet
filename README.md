@@ -5,8 +5,10 @@ This repository for users to help themselves for Mule4 projects.
 
 # TLS with Mule4
 TLS allows to secure API's with Mule4. 
+
 ## Keytool
 Keytool is a java based tool which help to generate, list, import, export etc. TLS certificates to/from java keystore. Mule support both ``` JKS``` and ``` PKCS12``` keystores,however here we gonna generate JKS keystore & trust store using keytool.
+
 ### Generate mule.jks and mule-trust.jks
 ```sh
 ## move to tmp directory

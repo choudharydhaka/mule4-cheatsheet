@@ -1,0 +1,1025 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="marriages-proc-api-test-suite.xml" />
+	<import doc:name="Import" doc:id="12b7a822-caff-47a7-9296-f3472668863c" file="common-munit-utilities.xml" doc:description="Imported common-munit-utilities.xml"/>
+	<import doc:name="Import" doc:id="670c4e19-dac0-42d6-b030-1ebee121ab33" file="dia-standard-munit-test-suite.xml" doc:description="Imported dia-standard-munit-test-suite.xml"/>
+	<sub-flow name="mock-sys-api-successful-response" doc:id="cf62fe6b-03aa-47f3-bb6e-f834c476b066" >
+		<ee:transform doc:name="Set Successful Response for Marriage Registration SYS API Response" doc:id="7c7b009c-0d05-4b18-8463-b9405408faf2">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+readUrl('classpath://sample_data/sys-api-marriages-registration-successful-response.json', 'application/json')]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+	</sub-flow>
+
+	<munit:test name="get-register-successful-test-case" doc:id="682bec9f-cdb9-4e8d-a608-ca34131cc45e" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Mock SYS API for Marriage Registration Successful Response" doc:id="c7b1a82d-d8f8-4266-9580-9a894b98c0ad" name="mock-sys-api-successful-response"/>
+			<munit-tools:mock-when doc:name="Mock when Sys API Invoked for Marriage Registration Details" doc:id="e954aff8-0f1b-4e70-80a1-d51651d2a254" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0
+output application/json
+---
+readUrl('classpath://sample_data/sys-api-marriages-registration-successful-response.json', 'application/json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request Marriage Proc API" doc:id="b189c857-495f-4a85-b0d7-a73a5a55781b" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>				
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that Status Code is 200" doc:id="42414e51-b190-416d-8ac4-5963adce3061" is="#[MunitTools::equalTo(200)]" message="Status Code should be 200" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that spouse names are Neighbour" doc:id="800e11a2-14b2-464d-8e19-9ce88b764ff1" expression="#[payload[0].spouseFirstNames]"  is="#[MunitTools::equalTo('NEIGHBOUR')]" message="Sys API should return back SpouseNames NEIGHBOUR"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="get-marriage-forbideen-test-case" doc:id="b22d99f7-4a75-48a2-b5cb-42229cc9ee46" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Mock SYS API for Marriage Registration Successful Response" doc:id="c638a7bd-bca4-4101-ad24-e821ee110227" name="mock-sys-api-successful-response"/>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="b58e4135-c1c2-4d95-b659-47f78233fb20" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0
+output application/json
+---
+readUrl('classpath://sample_data/sys-api-marriages-registration-successful-response.json', 'application/json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="1efc8e71-30cf-4cb6-84e8-39a39cb7737e" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "123456789012345"
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="400" />
+				</http:response-validator>				
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that Status Code is 400" doc:id="f672b69b-880e-44bb-a39c-4b52e7bdadd6" is="#[MunitTools::equalTo(400)]" message="Status Code should be 400" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that Payload Status is 400" doc:id="1b7fe147-f8e8-43b0-8202-7dfcc4df13af" expression="#[payload.status]" is="#[MunitTools::equalTo(400)]" message="Proc API has returned 400 staus"/>
+		</munit:validation>
+	</munit:test>
+
+
+	<munit:test name="system-api-returns-bad-request-test-case" doc:id="7f9188b2-6314-4035-978a-e702424af2f6" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="fa963d25-9a77-4309-950d-abd9a07ae72e" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="a8848461-0c09-4065-80ba-66a931a8383e" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>				
+			
+</http:request>		
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="ed158a74-d677-48e1-9fb3-f300780bfed4" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="c4ea1de1-88d3-4b38-9b1c-422499e54b16" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-not-found-error-test-case" doc:id="9fa52177-298d-4c84-82a9-8886773536f6" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="28ed7443-e30d-45ed-b99b-b718cc8d7873" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:NOT_FOUND"/>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="4b6adde9-ebb2-43b7-b96b-6438ec0fe342" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>				
+			
+</http:request>			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="e0685b34-f0c0-4bba-b24d-eaadc58810b1" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="54582077-91f3-4815-88ed-af5bea83db73" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-unsupported-media-type-error-test" doc:id="5bff0257-abd4-419e-b207-99ebe06fd5fa" description="Unsupported Media Type Error">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Set Idal Sys Api Header Variable  Sub Flow" doc:id="e070b8fb-527f-406a-9b8f-e66148ff92e9" name="set-idal-sys-api-header-variable-sub-flow"/>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="9979f08b-283b-4fa4-a93f-258870bd6250" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="d549277d-1039-4b87-b5f4-768fe735a01b" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers><![CDATA[#[output application/java
+---
+vars.systemApiHeader]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>
+			</http:request>			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="6d409712-304a-43e7-875a-3ebf1fe1d6ca" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="23c965e8-2af9-4154-996e-688e1a1ec7f7" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-not-acceptable-error-test" doc:id="4b54f608-1690-4b72-99f7-63c82a7f622e" description="Unsupported Media Type Error">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Set Idal Sys Api Header Variable  Sub Flow" doc:id="cb109d88-be39-45c6-be4d-45252511518c" name="set-idal-sys-api-header-variable-sub-flow"/>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="4cc1502f-6956-489f-b917-b450461a7b63" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="9499b992-4397-402c-9556-36a61e8ad6b3" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers><![CDATA[#[output application/java
+---
+vars.systemApiHeader]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="6423deff-d8ab-454e-a518-8a62fcb58f2f" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="02429b9e-fc8e-4ee0-8004-92781aef297e" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-service-unavailable-error-test" doc:id="c2f84e7a-8952-40df-b1f8-c5b29483bc6c" description="Unsupported Media Type Error">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Set Idal Sys Api Header Variable  Sub Flow" doc:id="2676a266-c883-4335-89ed-0ef43a3c3ccb" name="set-idal-sys-api-header-variable-sub-flow"/>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="35055e48-d4d5-4125-a3c6-3d008c208042" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:SERVICE_UNAVAILABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="a899f7d8-cd35-45b3-b25b-97772d0d62a9" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers><![CDATA[#[output application/java
+---
+vars.systemApiHeader]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="503" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 503" doc:id="7945ea8e-cd9e-4e3d-b76f-3eeed3fb4e9d" is="#[MunitTools::equalTo(503)]" message="Status Code should be 503" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 503" doc:id="9fb639b8-af4b-48c5-9dcb-a5126e19ae14" expression="#[payload.status]" is="#[MunitTools::equalTo(503)]" message="Sys API should return back with Payload Status with 503"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-connectivity-error-test" doc:id="1395dd1f-b97a-437e-814d-88acf3b2bedf" description="Unsupported Media Type Error">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Set Idal Sys Api Header Variable  Sub Flow" doc:id="07cbd2df-d08a-418b-b974-a71e0f43be49" name="set-idal-sys-api-header-variable-sub-flow"/>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="f8f598c3-4557-47ee-be2d-47c71ae9a7fa" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="9b90c6c7-0743-430d-ad53-862f7aab4580" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers><![CDATA[#[output application/java
+---
+vars.systemApiHeader]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="503" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 503" doc:id="8df1206f-8d25-465b-901e-313ba878ef30" is="#[MunitTools::equalTo(503)]" message="Status Code should be 503" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 503" doc:id="16e9080d-2c4a-472b-b499-68bb643c5606" expression="#[payload.status]" is="#[MunitTools::equalTo(503)]" message="Sys API should return back with Payload Status with 503"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="marriage-proc-api-health-check-tls-test" doc:id="988ca2f4-a65b-4866-9aca-7484cd6006f2" description="TLS Health Check test case">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="get:\health:ei-marriages-proc-api-config" />
+			<munit:enable-flow-source value="tls-ei-marriages-proc-api-main" />
+		</munit:enable-flow-sources>
+		<munit:execution >
+			<http:request method="GET" doc:name="HTTP Get (Health) Request" doc:id="5d1abd52-92e2-4a78-8a17-d0fe9ceb0e6e" config-ref="munit-https-request-configuration" path="/${api.version}/health">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Value",
+	"x-gw-api-secret" : "test",
+		"x-identifiers" : "test"
+}]]]></http:headers>
+			</http:request>
+		
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b2f65cf8-5c44-4979-b253-85c9a088b1ff" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="marriage-proc-api-health-check-test" doc:id="621cd583-6696-44d2-8e6c-51c99619cd1d" description="MUnit Test- case 02">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\health:ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:execution >
+			<http:request method="GET" doc:name="HTTP Get (Health) Request" doc:id="ba1cfe10-c4b9-4b10-af88-1288b2a10fca" config-ref="munit-http-request-configuration" path="/${api.version}/health">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Value",
+	"x-gw-api-secret" : "test"
+}]]]></http:headers>
+			</http:request>
+		
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="f71ada16-cf66-4d51-97bf-93065c5c001a" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+		<munit:test name="marriage-proc-api-health-check-downstream-true-test" doc:id="73dbbc76-0fb0-4edd-9d65-81dcc99a9ee0" description="MUnit Test- case 02">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\health:ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when sys API (/health) returns success" doc:id="0475356b-8800-40e6-b259-c6f2cb155580" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>				
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[%dw 2.0
+output application/json
+--- {
+  "status": "Success",
+  "message": "Request Made Successfully",
+  "version": "m.12"
+}]' mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="GET" doc:name="HTTP Get (Health) Request" doc:id="918c8af8-0b8a-4dd3-9f17-b5e678350c16" config-ref="munit-http-request-configuration" path="/${api.version}/health">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Value",
+	"x-gw-api-secret" : "test"
+}]]]></http:headers>
+				<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"callDownstream" : "true"
+}]]]></http:query-params>
+			
+</http:request>
+		
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that payload is not null" doc:id="f11bb6af-7fe8-487b-9bcc-b1f154c8b7ed" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is success" doc:id="064261c0-cf06-4e00-b50a-79e9e60155b0" is='#[MunitTools::equalTo("Success")]' message="Payload message is expected to be Success." expression="#[payload.status]"/>
+		
+</munit:validation>
+	</munit:test>
+	<munit:test name="marriage-proc-api-health-check-downstream-true-with-error-test" doc:id="1bfb9c85-3c10-4c22-bf21-bab1b00ab4a2" description="MUnit Test- case 02">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\health:ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when sys API throws Bad Request" doc:id="d02713ca-fbb4-411a-a34d-5181f6890a9c" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="GET" doc:name="HTTP Get (Health) Request" doc:id="26b5c491-e25e-4f01-9aa8-bc4227bc9ee8" config-ref="munit-http-request-configuration" path="/${api.version}/health">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Value",
+	"x-gw-api-secret" : "test"
+}]]]></http:headers>
+				<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"callDownstream" : "true"
+}]]]></http:query-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="503" />
+				</http:response-validator>
+			
+</http:request>
+			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that payload is not null" doc:id="40aa2590-2083-486d-b40c-606c8a3fa88c" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="system-api-returns-unauthorised-error-test-case" doc:id="00452218-5cc2-466f-9540-ca88720d7a50" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="2e1b0894-6a7b-4181-af38-9a74f9b491c1" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:UNAUTHORIZED"/>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API Request" doc:id="a301425e-09f1-4520-8254-e0344a25c2a3" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>				
+			
+</http:request>
+			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="71cd8b9c-f58a-4a1b-8fc3-f0140c179493" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="75c2017a-bf70-4134-98a4-94388b11cd9f" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-forbidden-error-test-case" doc:id="d80e3dcf-75c6-4e90-959f-6b1c1e16b5b6" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="875bd2e4-b713-469e-aa3e-467edb967267" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:FORBIDDEN"/>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Marriage Proc API GET Request" doc:id="a26c13f8-8355-4b39-8ff6-6eb066b59a3f" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>		
+			</http:request>
+			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="a7f5e705-9268-425a-8b26-5dbd4c0089c7" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="65f27a17-7ea7-45cd-b311-e071bbfb09cd" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-timeout-error-test-case" doc:id="d2c93d41-6d04-4da5-be55-9501192b2c6f" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="3e90ce3c-394f-44bd-a017-f3846b82336d" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:TIMEOUT"/>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request" doc:id="4e170676-9731-4da9-b871-573714b4b4d8" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>	
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>	
+			</http:request>
+			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="a9b6df16-ce58-46cf-9b8e-41b9c9b8e307" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="0baf00d3-0512-49c6-bf1b-82d0e31dc003" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-internal-server-error-test-case" doc:id="3e839723-101f-4726-b9e7-aacda2637272" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="7f8995c7-bf1d-4b43-8321-bfd2bdca3f78" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:INTERNAL_SERVER_ERROR"/>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request" doc:id="68ebf1cc-371f-4f1d-a9e9-a8e263c748a5" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>	
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>	
+			</http:request>
+			
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="70e4652f-1d5d-463f-9d4d-a996d26301bc" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="40f39ade-6154-4bda-b36d-cf071d5d7b40" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="system-api-returns-method-not-allowed-error-test-case" doc:id="e4be4af5-d288-4edc-b9e8-beffbc28e67d" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when HTTP Sys API Invoked" doc:id="173cea70-9f8b-4986-a079-5fc0868c603a" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[payload]" mediaType="application/json" />
+					<munit-tools:error typeId="HTTP:METHOD_NOT_ALLOWED"/>
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request" doc:id="5df04abb-a2f2-4687-ad31-09a1e0ab362f" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>	
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>	
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that HTTP Status Code is 500" doc:id="4d4a4202-e615-4bd3-889c-e0d742ef92b1" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that payload status is 500" doc:id="1109af67-e503-494b-8890-3d75e5a5b676" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]" message="Sys API should return back with Payload Status with 500"/>
+		</munit:validation>
+	</munit:test>
+	
+<!--  DIA Standard MUnit test cases starts here, the reason to put them here Munit is not running test cases from two files on single endpont	          -->
+	
+	<munit:test name="400-bad-request-error-test" doc:id="1a106de9-0c32-4aac-b460-c23bc753fb92" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Flow Reference to JWT Assertions" doc:id="bf8aac9b-62e5-49ce-ace6-57b114188dac" name="munit-400-bad-request-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request" doc:id="02c6c1a5-298b-456c-a0dc-f13cf0cf9da9" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "123456789012345"
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="400" />
+				</http:response-validator>				
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that Status Code is 400" doc:id="0ea20eca-594d-4501-b829-5a90427a59e8" is="#[MunitTools::equalTo(400)]" message="Status Code should be 400" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that Payload Status is 400" doc:id="52a8d05f-8cb2-4f94-9cee-3dcd4a2fee0a" expression="#[payload.status]" is="#[MunitTools::equalTo(400)]" message="Proc API has returned 400 staus"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="404-not-found-error-test" description="Test" doc:id="0997cb30-790a-4636-9b7f-7c4f3d5cee94">	 
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Flow Reference 404 behaviour" doc:id="611c0da3-6c39-4bb3-89b7-878c9ad5bd1b" name="munit-404-not-found-behaviour"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="#[vars.testHttpMethod]" doc:name="Request to Marriage Proc API" doc:id="5d43a10f-3519-4f63-9e1f-240e43770bb7" config-ref="munit-http-request-configuration" path='#[vars.testHttpRequestPath]'>
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "anyValue",
+	"x-gw-api-secret" : "anySecret",
+	"Accept" : "text/plain",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="404" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert That HTTP Status Code is 404" doc:id="c37a4935-3546-404b-bf66-bad79b232ab0" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(404)]"/>
+			<munit-tools:assert-that doc:name="Assert That Payload status is equal to 404" doc:id="78dfc2e3-7627-4bb4-b56b-fe4e0f2ae7f1" expression="#[payload.status]" is="#[MunitTools::equalTo(404)]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="405-method-not-allowed-error-test" description="Test" doc:id="167ca594-f4c8-49fc-bcc7-9648cc1c1788">	 
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Flow Reference 405 Behaviour" doc:id="60b5a009-50d9-4bad-af1e-e7fc8bffdd90" name="munit-405-method-not-allowed-behaviour"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="#[vars.testHttpMethod]" doc:name="Request to Marriage Proc API" doc:id="ad0e18da-1a15-48b5-a190-ffc29d20408d" config-ref="munit-http-request-configuration" path="#[vars.testHttpRequestPath]">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "anyValue",
+	"x-gw-api-secret" : "anySecret",
+	"Accept" : "text/plain",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="405" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert That HTTP Status Code is 405" doc:id="be8ede6f-cc8d-4f1f-a420-71a7e145397a" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(405)]"/>
+			<munit-tools:assert-that doc:name="Assert That Payload status is equal to 405" doc:id="62eb6039-e416-46cf-8815-32f567f3f2b0" expression="#[payload.status]" is="#[MunitTools::equalTo(405)]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="406-not-acceptable-error-test" description="Test" doc:id="2ab3acb0-46f7-4cff-be01-d9675eb34470">	 
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Flow Reference 406 Behaviour" doc:id="2717ddc2-91c9-49fa-892e-1b4c66135766" name="munit-406-not-acceptable-behaviour"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="#[vars.testHttpMethod]" doc:name="Request to Marriage Proc API" doc:id="1b989c03-03b0-4ac5-a37a-f250145235d5" config-ref="munit-http-request-configuration" path="#[vars.testHttpRequestPath]">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "anyValue",
+	"x-gw-api-secret" : "anySecret",
+	"Accept" : "text/plain",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="406" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert That HTTP Status Code is 406" doc:id="53e5ac62-adca-4b31-bda3-af181099603d" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(406)]"/>
+			<munit-tools:assert-that doc:name="Assert That Payload status is equal to 406" doc:id="2c2f138f-6b4b-424e-86a1-384b95b45bb1" expression="#[payload.status]" is="#[MunitTools::equalTo(406)]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="415-unsupported-media-type-error-test" description="Test - THIS TEST IS DISABLED UNTIL ANY OTHER HTTP METHOD GETS ADDED [GET DOESN'T SUPPORT MEDIA TYPE]" doc:id="fd2fdaf7-10d0-45e3-9732-46e04eef700b">	 
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Flow Reference 415 behaviour" doc:id="9deba3dd-2292-4271-9d52-53000758de8e" name="munit-415-unsupported-media-type-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="#[vars.testHttpMethod]" doc:name="Request to Marriage Proc API" doc:id="1b7027d3-bcbc-4b47-822a-2682546552bb" path="#[vars.testHttpRequestPath]" config-ref="munit-http-request-configuration">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "anyValue",
+	"x-gw-api-secret" : "anySecret",
+	"Accept" : "text/plain",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>				
+				<http:response-validator >
+					<http:success-status-code-validator values="415" />
+				</http:response-validator>
+			</http:request>		
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert That HTTP Status Code is 415" doc:id="ed405d58-f26b-4099-a405-da2d0008e452" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(415)]"/>
+			<munit-tools:assert-that doc:name="Assert That Payload status is equal to 415" doc:id="47ddc8e2-075a-40f2-9894-ae88d8f7e5c3" expression="#[payload.status]" is="#[MunitTools::equalTo(415)]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="501-not-implemented-error-test" description="Test Not Implemented Scenario" doc:id="8d0dc169-1ccc-441a-b508-0bed88c99676">	 
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Set Idal Sys Api Header Variable  Sub Flow" doc:id="4858b1a3-39d2-44b6-b037-49342a09d150" name="set-idal-sys-api-header-variable-sub-flow"/>
+			<flow-ref doc:name="Flow Reference 501 Behaviour" doc:id="a9729fa6-1bc7-4573-af9e-d7b10720f97c" name="munit-501-not-implemented-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="#[vars.testHttpMethod]" doc:name="Request to Marriage Proc API" doc:id="97956aaa-bf09-49f0-aa96-d7ffca9bf373" config-ref="munit-http-request-configuration" path="#[vars.testHttpRequestPath]">
+				<http:headers ><![CDATA[#[output application/java
+---
+vars.systemApiHeader]]]></http:headers>
+<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="501" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert That HTTP Status Code is 501" doc:id="d22cc67b-7298-4a6b-8711-cf97f1c99f6b" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(501)]"/>
+			<munit-tools:assert-that doc:name="Assert That Payload status is equal to 501" doc:id="07ff2931-62b7-4d41-8b93-5e28258558f8" expression="#[payload.status]" is="#[MunitTools::equalTo(501)]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="dia-500-internal-server-errort" description="Test Not Implemented Scenario" doc:id="26228bc6-8fbe-4532-8c77-5813910fa8f3">	 
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Invoke Set Idal Sys Api Header Variable  Sub Flow" doc:id="1682f92e-aab6-47af-8634-7311a24363b7" name="set-idal-sys-api-header-variable-sub-flow"/>
+			<flow-ref doc:name="Flow Reference 500 Behaviour" doc:id="ea69e7c9-05df-4636-95da-bc9a7ddcfad0" name="munit-dia-500-internal-server-error-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="#[vars.testHttpMethod]" doc:name="Request to Marriage Proc API" doc:id="60bd1748-a895-4133-a6fd-75abecacb6c3" config-ref="munit-http-request-configuration" path="#[vars.testHttpRequestPath]">
+				<http:headers ><![CDATA[#[output application/java
+---
+vars.systemApiHeader]]]></http:headers>
+<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert That HTTP Status Code is 500" doc:id="73b9172e-6086-473f-ba46-b29a5f6cc5b4" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(500)]"/>
+			<munit-tools:assert-that doc:name="Assert That Payload status is equal to 500" doc:id="0fef9a9e-7392-47a9-9752-ce8eae2a3160" expression="#[payload.status]" is="#[MunitTools::equalTo(500)]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="any-error-test" description="Test" doc:id="b2f8ae74-751d-46a1-92ca-ce549249b01c">
+		<munit:enable-flow-sources >
+		<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<flow-ref doc:name="Set Payload For Transaction" doc:id="7b652a72-c618-4676-8af9-92d9b6739612" name="munit-any-error-behaviour"/>
+			<munit-tools:spy doc:name="Spy" doc:id="98f8986e-39db-4bb5-a15c-d87473d0ca98" processor="flow-ref">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute attributeName="doc:name" whereValue="Call Additional Log Transform Sub Flow For Error" />
+					</munit-tools:with-attributes>
+				<munit-tools:before-call>
+					<flow-ref doc:name="Flow Reference to Logs Assertions For 500 Error" doc:id="3e39e7c9-5da4-4c0b-b1d6-808b729de64c" name="munit-logs-assertions-for-500-error" />
+				</munit-tools:before-call>
+			</munit-tools:spy>
+			<munit-tools:mock-when doc:name="Mock apikit:router to return payload with status of 500" doc:id="5fd368dc-5c25-4adc-a697-0d9309988a74" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ei-marriages-proc-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[%dw 2.0 output application/json --- {"status" : "500" }]' mediaType="application/json"/>
+					<munit-tools:error typeId="#['APIKIT:ANY']" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>	
+			<http:request method="#[vars.testHttpMethod]" doc:name="POST Request for Marriage Proc API" doc:id="649f6c16-9bbf-4d58-8d75-8ee2946f132b" config-ref="munit-http-request-configuration" path="#[vars.testHttpRequestPath]">				
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "pass-anything-here",
+	"x-gw-api-secret" : "pass-anything-here",
+	"Content-Type" : "application/json",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : 12323
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that status code is 500" doc:id="a0e7b459-036b-4974-92e8-1e588999b0aa" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(500)]"/>
+		</munit:validation>
+	</munit:test>
+	
+<munit:test name="marriages-proc-api-validation-test" description="Test" doc:id="b2f8ae74-751d-46a1-92ca-ce549249b01c">
+	<munit:enable-flow-sources>
+			<munit:enable-flow-source value="ei-marriages-proc-api-main" />
+			<munit:enable-flow-source value="get:\register\(registrationNumber):ei-marriages-proc-api-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when Sys API Invoked for Marriage Registration Details" doc:id="fed83fcd-6a31-4216-a515-4a0bb71750de" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="marriages-sys-request-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0
+output application/json
+---
+readUrl('classpath://sample_data/sys-api-marriages-registration-successful-empty-response.json', 'application/json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<set-variable value="munit thrown exeception" doc:name="Set Variable" doc:id="5141717b-cc03-422c-b0de-7bf349924906" variableName="error.cause.localizedMessage" />
+		
+		</munit:behavior>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request Marriage Proc API" doc:id="a99cf95f-18af-4757-96c8-0ec8322b8412" config-ref="munit-http-request-configuration" path="/${api.version}/register/{registrationNumber}">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>
+				<http:response-validator >
+					<http:success-status-code-validator values="500" />
+				</http:response-validator>				
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<logger level="INFO" doc:name="Logger" doc:id="26c86420-8e8f-4359-b05d-2090ac0914ca" message="#[output application/json --- DHAKA: payload]"/>
+			<munit-tools:assert-that doc:name="Assert that Status Code is 500" doc:id="0422d127-2631-4c8f-8a96-ce55037478d2" is="#[MunitTools::equalTo(500)]" message="Status Code should be 500" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that errorCode is INTERNAL_SERVER_ERROR" doc:id="f29f310f-49e3-43c8-9347-026f06500c2b" expression="#[payload.errorCode]"  is="#[MunitTools::equalTo('INTERNAL_SERVER_ERROR')]" message="API should return errorCode INTERNAL_SERVER_ERROR"/>
+		</munit:validation>
+	</munit:test>
+
+</mule>
