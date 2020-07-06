@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="apikit-error-test-suite.xml" />
+	<import doc:name="Import" doc:id="4907f3ca-3f16-43e3-847b-d88024cb401d" file="common-munit-utilities.xml" />
+	 
+	<munit:test name="400-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 400 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-400-bad-request-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[400 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="404-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set  404 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-404-not-found-behaviour"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[404 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+	
+
+	 <munit:test name="405-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 405 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-405-method-not-allowed-behaviour"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[405 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+		</munit:test>
+		 <munit:test name="406-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 406 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-406-not-acceptable-behaviour"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[406 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>	
+		</munit:test>
+			 <munit:test name="415-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 415 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-415-unsupported-media-type-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[415 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>	
+		</munit:test>
+	
+				 <munit:test name="501-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 501 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-501-not-implemented-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[501 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>	
+	
+	</munit:test>
+				 <munit:test name="500-apikit-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-500-internal-server-error-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[500 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>	
+	</munit:test>
+	
+	<munit:test name="500-mule-expression-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-500-mule-expression-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[500 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+		<munit:test name="400-nzpost-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-nzpost-400-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[400 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="404-nzpost-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-nzpost-404-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[404 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="409-nzpost-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-nzpost-409-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[409 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="503-nzpost-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-nzpost-503-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[503 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="500-nzpost-test" doc:id="64db9b1f-1f78-47cd-a28d-2a62b964266b" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="digital-legacy-identity-main" />
+			<munit:enable-flow-source value="get:\health:digital-legacy-identity-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<flow-ref doc:name="Set 500 behaviour" doc:id="7c7553aa-d61a-48c3-a597-5bc621f927e5" name="munit-nzpost-500-behaviour-sub-flow"/>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Request" doc:id="774f4512-a48d-4ab6-88e9-294779c8d7f4" name="munit-common-http-requester-sub-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert http status code" doc:id="6a78b1df-e305-40ad-86f6-06d87108d345" actual="#[attributes.statusCode as Number]" expected="#[500 as Number]" message="Http status code is not equal"/>
+			<munit-tools:assert-equals doc:name="Assert success" doc:id="cfabaecf-ecad-4731-b41a-e97992cce196" actual="#[payload.success]" expected="#[false]" message="success is not equal" />
+			<munit-tools:assert-equals doc:name="Assert message_id" doc:id="2a104bb2-db1f-4016-a8ed-98e2c05d83fd" actual="#[payload.message_id]" message="message_id  not equal" expected="#[vars.request.apiHeaders.message_id]"/>
+		</munit:validation>
+	</munit:test>
+</mule>
