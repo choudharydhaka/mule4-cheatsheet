@@ -1,8 +1,34 @@
-# mule4-cheatseat
+- [Mule4 cheatsheet](#mule4-cheatsheet)
+- [Mule projects](#mule-projects)
+- [TLS with Mule4](#tls-with-mule4)
+  * [Keytool](#keytool)
+    + [Generate mule.jks and mule-trust.jks](#generate-mulejks-and-mule-trustjks)
+    + [Restrict server-crt to dhaks.localhost.nip.io dns name and ip address 127.0.0.1](#restrict-server-crt-to-dhakslocalhostnipio-dns-name-and-ip-address-127001)
+  * [Curl](#curl)
+  * [Debug java ssl](#debug-java-ssl)
+  * [sed, a stream editor](#sed--a-stream-editor)
+  * [Example1:  Tls v1.2 enabled in Mule4](#example1---tls-v12-enabled-in-mule4)
+  * [Example2: Add logger in Mule4 code](#example2--add-logger-in-mule4-code)
+    + [Before: File health-implementation.xml](#before--file-health-implementationxml)
+    + [Run below command:](#run-below-command-)
+    + [After: File health-implementation.xml](#after--file-health-implementationxml)
+  * [Example3: Enable debug for database extension](#example3--enable-debug-for-database-extension)
+  * [Custom Security Policy](#custom-security-policy)
+    + [Create a project using Maven archtype](#create-a-project-using-maven-archtype)
+  * [Dataweave 2.0](#dataweave-20)
+    + [Define New Class object](#define-new-class-object)
+
+# Mule4 cheatsheet
 This repository for users to help themselves for Mule4 projects.
 
-# Design API with Workbench
-Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.
+# Mule projects
+Here you can find the projects which has an example API running with concepts in details.
+
+|Project|Description|Links|
+|-|-|-|
+|Design API with Workbench| Workbench an Atom editor plugin allows us to design RAML specification |Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.|
+|How to use secure properties| Mule allows to encrypt any secrets|Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/secure-property)
+
 
 # TLS with Mule4
 TLS allows to secure API's with Mule4. 
