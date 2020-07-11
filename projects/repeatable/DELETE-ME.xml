@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<global-property doc:name="Global Property" doc:id="23d0bab8-43fd-4d90-8628-0d0e62936d61" name="mule.environment" value="temp" />
+	<global-property doc:name="Global Property" doc:id="6af3b435-b057-4f48-a6bb-75bd9da5334c" name="revision" value="1" />
+	<flow name="DELETE-MEFlow" doc:id="8c80e172-6569-436b-bd65-2526c31d232f" >
+		<logger level="INFO" doc:name="Logger" doc:id="adbd4c9d-5b0e-4e11-a653-e18549c5d844" />
+	</flow>
+	
+	
+</mule>

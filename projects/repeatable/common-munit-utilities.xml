@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="common-munit-utilities.xml" />
+
+	<http:request-config name="munit-http-request-configuration" doc:name="HTTP Request configuration" doc:id="6016fc7b-a8a0-4a89-90bc-5c53386d0980" basePath="/${api.baseUrl}" responseTimeout="#[60000]">
+		<http:request-connection host="${api.host}" port="${http.private.port}"   connectionIdleTimeout="180000"/>
+	</http:request-config>
+	 
+	 
+	<sub-flow name="munit-common-http-requester-sub-flow" doc:id="fab8c35e-d25a-4f52-9a2c-3e429c119eb3" >
+				<logger level="INFO" doc:name="Logger" doc:id="6927725d-191a-49ea-bdbf-7308318659af" message="#[output application/json --- req: vars.request]"/>
+		<http:request method="#[vars.request.testHttpMethod]" doc:name="Request to API" doc:id="2165c75e-a7df-4a44-b20f-48ea0c95582a" config-ref="munit-http-request-configuration" path="#[vars.request.testHttpRequestPath]">
+				<http:body ><![CDATA[#[output application/json --- vars.request.apiRequestPayload]]]></http:body>
+			<http:headers><![CDATA[#[output application/java
+---
+vars.request.apiHeaders]]]></http:headers>
+				<http:uri-params><![CDATA[#[output application/java
+---
+vars.request.apiUriParams]]]></http:uri-params>
+				<http:query-params ><![CDATA[#[output application/java
+---
+vars.request.apiQueryParams]]]></http:query-params>
+			<http:response-validator>
+					<http:success-status-code-validator values="#[vars.request.responseCode default 200]" />
+				</http:response-validator>
+			</http:request>
+	</sub-flow>
+	
+	
+<sub-flow name="munit-400-bad-request-behaviour-sub-flow" doc:id="a05f8fef-f48c-4ab4-900f-d90c4e884535" >
+		<ee:transform doc:name="Set Request Details" doc:id="23a6beae-7781-4b5a-b98f-22aa40920e56" >
+		<ee:message >
+		</ee:message>
+		<ee:variables >
+		
+			<ee:set-variable variableName="request" ><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 400
+}
+]]></ee:set-variable>
+
+					 
+				</ee:variables>
+			</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when APIKit Router throws ANY Error" doc:id="da3e8f66-1ca1-4338-bc66-151fe68f6ae4" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:payload value="#[payload]" mediaType="application/json" />
+				<munit-tools:error typeId="#['APIKIT:BAD_REQUEST']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>
+	</sub-flow>
+	<sub-flow name="munit-404-not-found-behaviour" doc:id="f11955e5-7510-4403-8d34-4a977b62a80f">
+		
+		
+					<ee:transform doc:name="Set Request Details" doc:id="23a6beae-7781-4b5a-b98f-22aa40920e56" >
+		<ee:message >
+		</ee:message>
+		<ee:variables >
+		
+			<ee:set-variable variableName="request" ><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health/resource-not-find"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 404
+}
+]]></ee:set-variable>
+
+					 
+				</ee:variables>
+			</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_FOUND_ERROR" doc:id="d1375507-91b2-4794-b26a-2db6e2911cd7" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:NOT_FOUND']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>
+	</sub-flow>
+
+	
+	<sub-flow name="munit-405-method-not-allowed-behaviour" doc:id="b0f4e778-d5a8-4029-80ab-1e06faef7113">
+		<ee:transform doc:name="Set Request Details" doc:id="c9794474-6925-4407-9cae-7607b69563b6" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="request" ><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 405
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_FOUND_ERROR" doc:id="705a67b3-3f82-49e5-80a8-800a2769a0c4" processor="apikit:router">
+			<munit-tools:with-attributes>
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return>
+				<munit-tools:error typeId="#['APIKIT:METHOD_NOT_ALLOWED']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	<sub-flow name="munit-406-not-acceptable-behaviour" doc:id="2532cc86-1158-4d3c-952f-6b4048d65a12">
+		<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 406
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_ACCEPTABLE" doc:id="36fcd1d0-7a33-4b16-bb52-463b07f5f494" processor="apikit:router">
+			<munit-tools:with-attributes>
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:NOT_ACCEPTABLE']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	<sub-flow name="munit-415-unsupported-media-type-behaviour-sub-flow" doc:id="45ea9fbd-ecce-4ad3-ab81-8dea16fd5dca">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 415
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="c44d9eea-5c54-4826-84c9-b1272d5aa399" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:UNSUPPORTED_MEDIA_TYPE']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>
+	</sub-flow>
+
+	
+	<sub-flow name="munit-501-not-implemented-behaviour-sub-flow" doc:id="489c8fcb-a21a-4718-9b9a-bc932cd888f2">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 501
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when APIKIT:NOT_IMPLEMENTED" doc:id="9c6cd51c-e069-4778-90b9-dde687e07e9c" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['APIKIT:NOT_IMPLEMENTED']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+
+		<sub-flow name="munit-500-internal-server-error-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 500
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when ANY" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['ANY']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+ 		<sub-flow name="munit-500-mule-expression-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 500
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when MULE:EXPRESSION" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['MULE:EXPRESSION']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	
+			<sub-flow name="munit-nzpost-400-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 400
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when NZPOST:400_BAD_REQUEST" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['NZPOST:400_BAD_REQUEST']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+			<sub-flow name="munit-nzpost-404-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 404
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when NZPOST:404_NOT_FOUND" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['NZPOST:404_NOT_FOUND']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	
+			<sub-flow name="munit-nzpost-409-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 409
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when NZPOST:409_CONFLICT" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['NZPOST:409_CONFLICT']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+			<sub-flow name="munit-nzpost-500-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 500
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when NZPOST:500_INTERNAL_SERVER_ERROR" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['NZPOST:500_INTERNAL_SERVER_ERROR']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+			<sub-flow name="munit-nzpost-503-behaviour-sub-flow" doc:id="3017292a-f12d-41f9-b8b5-68202ddcd0e4">
+			<ee:transform doc:name="Set Request Details" doc:id="07c49692-018a-4542-a019-c4aecf248b77">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	apiRequestPayload: {},
+	apiHeaders: {message_id: uuid()},
+	testHttpRequestPath: "/health"  ,
+	testHttpMethod: "GET",
+	apiUriParams: {},
+	apiQueryParams: {},
+	responseCode: 503
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock when NZPOST:503_SERVICE_UNAVAILABLE" doc:id="f8507501-794d-4773-8565-83b5798997bb" processor="apikit:router">
+			<munit-tools:with-attributes >
+				<munit-tools:with-attribute whereValue="digital-legacy-identity-config" attributeName="config-ref" />
+			</munit-tools:with-attributes>
+			<munit-tools:then-return >
+				<munit-tools:error typeId="#['NZPOST:503_SERVICE_UNAVAILABLE']" />
+			</munit-tools:then-return>
+		</munit-tools:mock-when>	
+	</sub-flow>
+	
+	
+		
+</mule>

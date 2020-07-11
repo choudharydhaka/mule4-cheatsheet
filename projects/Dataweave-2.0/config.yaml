@@ -1,0 +1,8 @@
+#dataweave muckaround examples
+#values in here are retrievable via the p function 
+#(so long as there is a configuration properties global element)
+
+
+#this would be p("myproperty.blah") 
+myproperty:
+  blah: "A value"
