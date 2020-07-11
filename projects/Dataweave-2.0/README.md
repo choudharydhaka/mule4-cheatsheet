@@ -34,5 +34,10 @@
 
 [xmlFormat](./xmlFormat.md)
 
-[README message](./README.txt)
+## Other
 
+[README message](./README.txt)
+[config](./config.yaml)
+- download jar file for all the transformation examples
+
+[dataweave-muckaround](./dataweave-muckaround.jar)
