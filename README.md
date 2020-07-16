@@ -192,5 +192,77 @@ payload.requestTimestamp as DateTime { class : "java.sql.Date"}
 ```
 
 
+```
+<set-variable value='#["(objectGUID=" ++ (java!operator::Convertor::getSearchFilterFormattedGUID(vars.searchGuid)) ++ ")"]' doc:name="Set Guid Criteria" doc:id="5c1a95c5-fe2d-4a6d-b9c6-62bfb77cbcc0" variableName="criteria"/>
+		 ("guid": java!operator::Convertor::convertToDashedString(payload.objectGUID )) if (payload.objectGUID !=null ),
+write( java!operator::Convertor::getPass('&quot;' ++ vars.originalRequestData.password ++ '&quot;'),&quot;application/java&quot;)
 
+	 ("guid": java!operator::Convertor::convertToDashedString(vars.adSearchResponse.objectGUID )) if (vars.adSearchResponse.objectGUID !=null ),
+```
+
+```java
+package operator;
+
+import java.util.UUID;
+
+/**
+ * Convertor class to convert objectGUID byte array to a human readable string.
+ * code taken from Mulesoft Article : https://help.mulesoft.com/s/article/Ldap-ObjectGUID-field-retrieval
+ * 
+ * @author HaryoT
+ *
+ */
+ 
+public class Convertor {
+	
+	/**
+	 * Convert to human readable string.
+	 * @param objectGUID byte array returned by AD 
+	 * @return example: 91de7a48-7785-4ede-8d12-873e9c09deb0
+	 */
+	public static String convertToDashedString(byte[] objectGUID) {
+		if(objectGUID == null || objectGUID.length==0) return "false";
+		UUID uuid = bytesToUUID(objectGUID);
+		return uuid.toString();
+	}
+	
+	/**
+     * Converts a byte array into an {@link UUID} object.
+     * <p/>
+     * Microsoft stores GUIDs in a binary format that differs from the RFC standard of UUIDs (RFC #4122). (See details
+     * at http://en.wikipedia.org/wiki/Globally_unique_identifier) This function takes a byte array read from Active
+     * Directory and correctly decodes it as a {@link UUID} object.
+     *
+     * @param bytes Byte array received as en entry attribute from Active Directory.
+     * @return {@link UUID} object created from the byte array, or null in case the passed array is not exactly 16 bytes long.
+     */
+	private static UUID bytesToUUID(byte[] bytes) {
+        if (bytes != null && bytes.length == 16) {
+            long msb = bytes[3] & 0xFF;
+            msb = msb << 8 | (bytes[2] & 0xFF);
+            msb = msb << 8 | (bytes[1] & 0xFF);
+            msb = msb << 8 | (bytes[0] & 0xFF);
+
+            msb = msb << 8 | (bytes[5] & 0xFF);
+            msb = msb << 8 | (bytes[4] & 0xFF);
+
+            msb = msb << 8 | (bytes[7] & 0xFF);
+            msb = msb << 8 | (bytes[6] & 0xFF);
+
+            long lsb = bytes[8] & 0xFF;
+            lsb = lsb << 8 | (bytes[9] & 0xFF);
+            lsb = lsb << 8 | (bytes[10] & 0xFF);
+            lsb = lsb << 8 | (bytes[11] & 0xFF);
+            lsb = lsb << 8 | (bytes[12] & 0xFF);
+            lsb = lsb << 8 | (bytes[13] & 0xFF);
+            lsb = lsb << 8 | (bytes[14] & 0xFF);
+            lsb = lsb << 8 | (bytes[15] & 0xFF);
+
+            return new UUID(msb, lsb);
+        }
+        return null;
+    }
+}
+
+```
 
