@@ -1,5 +1,6 @@
 - [Mule4 cheatsheet](#mule4-cheatsheet)
 - [Mule projects](#mule-projects)
+  - [Object Store](./projects/object-store/Object-Store.md)
   - [Dataweave-2.0 Examples](./projects/Dataweave-2.0/)
 - [Cloudhub](#Cloudhub)
 - [TLS with Mule4](#tls-with-mule4)
