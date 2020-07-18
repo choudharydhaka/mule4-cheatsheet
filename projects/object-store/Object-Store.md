@@ -336,4 +336,4 @@ Please feel free to comment if I'm missing/wrong something
 
 
 # Resources
-[Mule App](./state-examples-with-config.jar)
+[Mule App](/projects/object-store/state-examples-with-config.jar)
