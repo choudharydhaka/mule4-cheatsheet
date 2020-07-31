@@ -1,0 +1,34 @@
+version: '2'
+services:
+  w1:
+    image: dhaks/mule4.2.2:1.0.0
+    hostname: suresh-cluster-w1
+    environment:
+#      - AMC_RUNTIME_TOKEN="TODO UPDATE ADD SERVER TOKEN HERE"
+#      - SKIP_AMC_REGISTRATION=FALSE
+#      - MULE_OPTS="-M-Djavax.net.debug=ssl"
+#    ports:
+#      - "9082:8082"
+#      - "9081:8081"
+    labels:
+      - "traefik.http.routers.w1.rule=Host(`w1.127.0.0.1.nip.io`)"
+
+  lb:
+    image: traefik:v2.1.4 # The official Traefik docker image
+    command: #iapio--api.insecure=true --providers.docker   --logLevel="DEBUG" # Enables the web UI and tells Traefik to listen to docker
+      - "--log.level=DEBUG"
+      - "--api=true"
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--ping=true"
+      - "--providers.docker=true"
+    ports:
+      - "80:80"     # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+      - "443:443"
+#    secrets:
+#      - test
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+#      - ./traefik/traefik.toml:/etc/traefik/traefik.toml # trafik config file
+ #     - "./traefik/:/opt/certs/"
