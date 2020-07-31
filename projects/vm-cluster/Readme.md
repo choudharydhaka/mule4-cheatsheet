@@ -1,5 +1,4 @@
-![](/.attachments/persitent-vm-mutilple-ch-worker
-
+ 
 
 # Prerequisite
 - Subscription Account (To run two cloudhub workers)
