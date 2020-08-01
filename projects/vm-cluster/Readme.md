@@ -35,6 +35,9 @@ Cloudhub provide two type of configuration for VM queues
     - Transient
 
 
+## Cloudhub architecture for both VM and Object Store
+![](/.attachments/persitent-vm-mutilple-ch-worker/ArchitectureDiagrams-INTSOL-cloudhub.png)
+
 ## How is the setup of Cloudhub?
 - Two workers need to deployed with the same application
 - Cloudhub provide funtionality to use Persistent storage which will allow to split the work load between workers, However you need to check the option from Runtime manager
@@ -69,6 +72,9 @@ Once we have configured this option Cloudhub will override any specific configur
 Cloudhub allow to configure persistent queues in -
 1. Single Application (Not demostrated here)
 2. Clustering mode
+
+## Customer-hosted cluster mode architecture for both VM and Object Store with Hazelcast
+![](/.attachments/persitent-vm-mutilple-ch-worker/ArchitectureDiagrams-clustered-mule-runtime-customer-hosted_RTF.png)
 
 ### Things to note
 - Retention time for messages in a persistent queue is up to 4 days
