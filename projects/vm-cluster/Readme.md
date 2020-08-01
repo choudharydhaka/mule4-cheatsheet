@@ -9,7 +9,7 @@
     - To send request please use hostname ``` http://w1.127.0.0.1.nip.io/```
     > Please add hosts file entry if necessary to resolve the hostname to 127.0.0.1
 
-VM Project
+# VM Project
 - [Download](/.attachments/persitent-vm-mutilple-ch-worker/vm-muckaround.zip)
 - Project has two type of VM configuration
     - Persistent (aw-received)
@@ -17,11 +17,17 @@ VM Project
     - Transient (t-aw-received)
         - queues are faster than persistent queues, but they are not reliable in the case of a system crash.
 
+This project allow a client to make a request for the order and then process it based on the reliability pattern. Which will help us to understand how the orders get processed. I have covered below mentioned processing
+- How the processing happens on two Cloudhub workers with and without persistent queue option enabled?
+- How the processing happens on Clustomer hosted in clustered mode 2 Mule runtime servers?
+
+
 ![](/.attachments/persitent-vm-mutilple-ch-worker/porject0.PNG)
 
-- We do have a listener configured ``` /receive``` to push the reqeuest to ``` aw-received``` queue
+- We do have a listener configured ``` /receive``` to push the reqeuest to ``` aw-received``` persistent queue
 ![](/.attachments/persitent-vm-mutilple-ch-worker/project1.PNG)
-- We do have a listener configured ``` /t/receive``` to push the reqeuest to ``` t-aw-received``` queue
+
+- We do have a listener configured ``` /t/receive``` to push the reqeuest to ``` t-aw-received``` transient queue
 ![](/.attachments/persitent-vm-mutilple-ch-worker/project1.PNG)
 
 
