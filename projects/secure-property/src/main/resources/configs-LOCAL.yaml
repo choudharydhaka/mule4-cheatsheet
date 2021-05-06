@@ -1,3 +1,15 @@
 local:
-  enc-test: "![9T5f/4hVrfREVPUjGg+ZK6lt/GCx1KcJDjjXUf8+w7A=]"
+  enc-test: "[9T5f/4hVrfREVPUjGg+ZK6lt/GCx1KcJDjjXUf8+w7A=]"
   normal-test: "this is non encrypted value"
+  host: localhost
+  port: "8082"
+  basepath: secure-property-api
+  version: v1
+  
+downstream:
+  host: localhost
+  port: "9083"
+  basepath: soap-service
+  version: v1
+  operation: body-file
+  

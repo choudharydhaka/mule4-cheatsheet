@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="interface-test-suite.xml" />
+	<http:request-config name="MUNIT_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="16f2dfb6-3530-40b8-86b7-fdfd8d21db02" basePath="${local.basepath}" >
+		<http:request-connection host="${local.host}" port="${local.port}" />
+	</http:request-config>
+<munit:before-test name="interface-test-suiteBefore_Test" doc:id="625d7e07-7097-45d8-bba8-ba99ff96808a" >
+		<logger level="INFO" doc:name="Logger" doc:id="f1f894c4-3c55-4c49-a5f1-51c6904cdcb1" message="#[WIREMOCK: p('downstream.host') ++ p('downstream.port') ++  &quot;/soap-service/v1/body-file&quot;]"/>
+		<ee:transform doc:name="Transform Message" doc:id="882dc4e2-2649-42f5-9782-f534698e4b29">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+import java!com::github::tomakehurst::wiremock::client::WireMock
+import java!com::github::tomakehurst::wiremock::WireMockServer
+output application/java
+---
+WireMockServer::new(p('downstream.host'), p('downstream.port'), "/soap-service/v1/body-file")
+
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		<java:new doc:name="New" doc:id="c92db5c2-be4a-46fe-bfb0-86d35885ebb6" class="com.github.tomakehurst.wiremock.junit.WireMockRule"/>
+	</munit:before-test>
+	<munit:test name="get-register-successful-test-case" doc:id="682bec9f-cdb9-4e8d-a608-ca34131cc45e" description="MUnit Test-Success">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="secure-property-main" />
+
+		</munit:enable-flow-sources>
+		<munit:execution>
+			<http:request method="GET" doc:name="Request Marriage Proc API" doc:id="b189c857-495f-4a85-b0d7-a73a5a55781b" config-ref="MUNIT_HTTP_Request_configuration" path="/api/${local.version}/health">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-gw-api-key" : "Blah",
+	"x-txn-identifiers" : "ewoJImNsaWVudE5hbWUiIDogIkNDTVMgVGVzdDIzNCIsCgkiZ2xvYmFsVHhuSWQiIDogIjdmZTY0ZDg0LWUyM2QtZGU1Ni05MDMzLWFiMzVhMDU4OWI2NiIsCgkicmVxdWVzdElkIiA6ICAiNTUzZTNkMjUtZjJjZC00ZDQzLTg4OTMtYTk4NWEwNzg5YTU1Igp9Cg==",
+	"x-gw-api-secret" : "23342",
+	"x-end-user-info" : "base-64-encoded-value"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"registrationNumber" : "12345"
+}]]]></http:uri-params>				
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<logger level="INFO" doc:name="Logger" doc:id="84f47898-3386-4998-84cf-85a24e934f15" message="#[output application/json --- data: payload]"/>
+			<munit-tools:assert-that doc:name="Assert that Status Code is 200" doc:id="42414e51-b190-416d-8ac4-5963adce3061" is="#[MunitTools::equalTo(200)]" message="Status Code should be 200" expression="#[attributes.statusCode]"/>
+			<munit-tools:assert-that doc:name="Assert that spouse names are Neighbour" doc:id="800e11a2-14b2-464d-8e19-9ce88b764ff1" expression="#[payload[0].spouseFirstNames]"  is="#[MunitTools::equalTo('NEIGHBOUR')]" message="Sys API should return back SpouseNames NEIGHBOUR"/>
+		</munit:validation>
+	</munit:test>
+
+
+
+
+</mule>
