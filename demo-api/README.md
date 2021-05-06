@@ -1,13 +1,13 @@
 # Introduction 
-  This API will be used to interact with the Marriage database (through iDAL SYS API). As per the requirement for SVC implementation, it will be having one resource to retrieve marriage registration details for a given marriage registration number. However, this API will/can be extended later to provide more functionality.
+x
 
 
 
 # Design Center Project
-https://anypoint.mulesoft.com/designcenter/designer/#/project/056b7a17-060b-41da-b2da-cc5b433eeb10
+https://anypoint.mulesoft.com/designcenter/designer/#/project/TODO
 
 # Exchange Asset
-https://anypoint.mulesoft.com/exchange/0b6403b0-a69c-459a-90da-ae4b2f7fc2e4/ei-marriages-proc-api/
+https://anypoint.mulesoft.com/exchange/TODO/demo-api/
 
 # URL
 URL: ``` https://{env}.ei.dia.govt.nz/ei-marriages-proc-ap/{version}/```
@@ -29,7 +29,7 @@ iDAL sys api
 ## Release Notes
 |Version|Date|ADO Reference|Change Summary|Changes|
 |---|---|-------|-------------|----|
-|1.0.0|30-Jan-2020|[23848](https://sdo-online.visualstudio.com/Te%20Ara%20Manaaki/_workitems/edit/23848)|Created first marriage api|Marriage api implemented, please check file **changelog** for more details |
+|1.0.0|30-Jan-2021||
 
 
 # Build and Test
@@ -45,9 +45,9 @@ mvn clean install -DskipTests
 
 # Run Locally
 Define the following runtime arguments
--DAPI_SECRET_PROP_KEY=<ei-encryption-key> -DCONFIG_HOME=. -DMULE_ENV=LOCAL -M-Danypoint.platform.gatekeeper=disabled -M-Dwrapper.debug=true
+-DAPI_SECRET_PROP_KEY=<encryption-key> -DCONFIG_HOME=. -DMULE_ENV=LOCAL -M-Danypoint.platform.gatekeeper=disabled -M-Dwrapper.debug=true
 
-> Note: Get the value for the ei-encryption key from the DEV release pipeline variable group EI-DEV-Secrets-Release-Pipeline-Variables
+> Note: Get the value for the encryption key from the DEV release pipeline variable group Release-Pipeline-Variables
 
 # Contribute
 
