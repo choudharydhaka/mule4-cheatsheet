@@ -23,7 +23,7 @@ where the value for **env** is one of mgmt-host or host from the table below.
 |PROD|sdo-prod-ei.ocp-prod|prod|
 
 # Downstream dependencies
-iDAL sys api
+
 
 
 ## Release Notes
