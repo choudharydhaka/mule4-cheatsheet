@@ -14,7 +14,7 @@
         <app.runtime>4.2.1</app.runtime>
 		<munit.version>2.1.5</munit.version>
 		<mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
-        <dia.common.project.version>1.0.37</dia.common.project.version>
+        
         <api.exchange.published.raml.asset.version>1.0.0</api.exchange.published.raml.asset.version>
         <api.exchange.org.id>TODO_UPDATE_ORG_ID</api.exchange.org.id>
 				<api_secret_prop_key>TODO_UPDATE_SECRET_KEY</api_secret_prop_key>
@@ -58,9 +58,8 @@
                             <format>html</format>
                         </formats>
 						<ignoreFiles>
-	  						<ignoreFile>ei-common-project.xml</ignoreFile>
-	  						<ignoreFile>operational-logging-implementation.xml</ignoreFile>
-	  						<ignoreFile>workaround-flow-for-errors.xml</ignoreFile>
+	  						<ignoreFile>common-project.xml</ignoreFile>
+
 	  						<ignoreFile>global-config.xml</ignoreFile>
 						</ignoreFiles>
                     </coverage>
@@ -103,12 +102,7 @@
 	</build>
 
 	<dependencies>
-       <dependency>
-            <groupId>nz.govt.dia.ei</groupId>
-            <artifactId>ei-common-project</artifactId>
-            <version>${dia.common.project.version}</version>
-            <classifier>mule-plugin</classifier>
-        </dependency>
+       
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -169,16 +163,7 @@
       <url>https://maven.anypoint.mulesoft.com/api/v2/maven</url>
       <layout>default</layout>
     </repository>
-        <repository>
-          <id>dev-azure-com-sdo-online-ei_build_dependencies</id>
-          <url>https://sdo-online.pkgs.visualstudio.com/_packaging/EI_Build_Dependencies/maven/v1</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
+        
     </repositories>
     <pluginRepositories>
         <pluginRepository>
