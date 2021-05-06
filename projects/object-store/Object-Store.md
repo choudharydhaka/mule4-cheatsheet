@@ -332,8 +332,14 @@ vars.value]' doc:name="give a message back to the user" doc:id="7a2221db-e758-4c
 Please feel free to comment if I'm missing/wrong something
 
 
+ 
 ![](/.attachments/mind-map/26e83130c8ad11eab83d0976b3e8e078.map.png)
 
 
 # Resources
 [Resources](/projects/object-store/resources.zip)
+ 
+
+ 
+[Mule App](![](/.attachments/object-store/state-examples-with-config.jar)
+ 
