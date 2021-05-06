@@ -10,17 +10,15 @@ https://anypoint.mulesoft.com/designcenter/designer/#/project/TODO
 https://anypoint.mulesoft.com/exchange/TODO/demo-api/
 
 # URL
-URL: ``` https://{env}.ei.dia.govt.nz/ei-marriages-proc-ap/{version}/```
+URL: ``` https://{env}.dhaks.co.nz/demo-api/{version}/```
 
-where the value for **env** is one of mgmt-host or host from the table below.
+where the value for **env** is one of host from the table below.
 
-|Env|Mgmt-host|Host|
+|Env| host| 
 |----|---------------------|--------------|
-|DEV|sdo-dev-ei.ocp-nonprod|dev|
-|TEST|sdo-test-ei.ocp-nonprod|test|
-|QA|sdo-qa-ei.ocp-nonprod|qa|
-|SUP|sdo-sup-ei.ocp-nonprod|sup|
-|PROD|sdo-prod-ei.ocp-prod|prod|
+|DEV|dev|dev|
+|TEST|test|test| 
+|PROD|www|prod|
 
 # Downstream dependencies
 
