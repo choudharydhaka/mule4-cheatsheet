@@ -7,7 +7,7 @@
   - [Object Store - CloudHub + OnPrim](projects/object-store/Object-Store.md)
   - [RAML Components Learning](projects/RAML/README.md)
   - [Mulesoft VM Queue](projects/vm-cluster/Readme.md)
-  - [Wiremock Mock Downstream APIs](projects/wiremock stubbing/README.md)
+  - [Wiremock Mock Downstream APIs](projects/wiremock-stubbing/README.md)
 - [Cloudhub](#Cloudhub)
 - [TLS with Mule4](#tls-with-mule4)
   * [Keytool](#keytool)
@@ -43,7 +43,7 @@ Here you can find the projects which has an example API running with concepts in
 |Object Store| Anypoint Object Store behaviour details on both OnPrim and CloudHub| Click [here](projects/object-store/Object-Store.md)|
 |Raml Components|Allows you to utilize RAML components|Click [here](projects/RAML/README.md)
 |MuleSoft VM Queue| Demostration to use VM Queue with different use cases|Click [here](projects/vm-cluster/Readme.md)
-|Wiremock - Mocking APIs|Wiremock is a very lightweight tool based on java, which allows you to mock the downstream REST/SOAP Services both static and dynamically|Click [here](projects/wiremock stubbing/README.md)|
+|Wiremock - Mocking APIs|Wiremock is a very lightweight tool based on java, which allows you to mock the downstream REST/SOAP Services both static and dynamically|Click [here](projects/wiremock-stubbing/README.md)|
 # Cloudhub
 ## How to find IP address of a cloudhub worker
 Cloudhub provide logging facility, where it will log an entry for the ipaddress.
