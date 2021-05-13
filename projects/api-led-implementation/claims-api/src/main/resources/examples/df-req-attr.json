@@ -1,0 +1,36 @@
+{
+    "headers": {
+      "host": "claims-ssin.us-e2.cloudhub.io",
+      "x-real-ip": "66.249.84.213",
+      "content-length": "1078",
+      "accept": "*/*",
+      "accept-encoding": "gzip,deflate,br",
+      "api_name": "$session.params.api_name",
+      "authorization": "Basic YWRtaW46YWRtaW4=",
+      "content-type": "application/json",
+      "user-agent": "Google-Dialogflow",
+      "x-forwarded-for": "66.249.84.213",
+      "x-forwarded-port": "443",
+      "x-forwarded-proto": "https"
+    },
+    "clientCertificate": null,
+    "method": "POST",
+    "scheme": "https",
+    "queryParams": {
+      
+    },
+    "requestUri": "/api",
+    "queryString": "",
+    "version": "HTTP/1.1",
+    "maskedRequestPath": "/",
+    "listenerPath": "/api/*",
+    "relativePath": "",
+    "localAddress": "/172.25.50.91:8082",
+    "uriParams": {
+      
+    },
+    "rawRequestUri": "/api",
+    "rawRequestPath": "/api",
+    "remoteAddress": "/3.21.129.41:19506",
+    "requestPath": "/api"
+  }

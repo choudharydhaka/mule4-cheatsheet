@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<flow name="TLS-claims-api-Flow" doc:id="c8418307-5958-4dda-a28e-712a13eb9ce4" >
+		<http:listener doc:name="/*" doc:id="d9836362-3af4-49d7-bba4-d7437e74acc4" config-ref="HTTPS_Listener_config" path="/*"/>
+		<flow-ref doc:name="health-claims-main-sublfow" doc:id="b22f599b-b982-4e8e-9db2-c7be91eacc67" name="health-claims-main-sublfow" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6945b0ef-fc39-4554-9c2e-0d6e5a8a633a" when="#[error.errorType.namespace == 'HTTP']"> 
+				<logger level="INFO" doc:name="Logger" doc:id="97ec432d-537b-4694-b6e9-d35b64467548" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Error from Claims SYS - #[ error.description ]'/>
+				<ee:transform doc:name="Transform Message" doc:id="64db075c-8e3e-4a37-a52e-62eb4214ac55" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Claims Sys API is not Healthy",
+	message: false
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f1294306-17f0-4b5f-9e0a-877b21f02a13">
+			<logger level="INFO" doc:name="Logger" doc:id="677d9e36-8c9a-40d4-9ac4-97c6e8c296d4" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Error from Claims PROC - #[ error.description ]'/> 
+				<ee:transform doc:name="Transform Message" doc:id="0de30b8c-8ef1-45cc-8c66-4e3143313412">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Claims Proc API is not Healthy",
+	message: false
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	
+</flow>
+
+<flow name="NON-TLS-claims-api-Flow" doc:id="d76cd959-03db-47a2-9a15-eb5fc5980def">
+		<http:listener doc:name="/*" doc:id="5dc7b6e5-1415-4187-b826-52648afc6e4c" config-ref="HTTP_Listener_config" path="/*" />
+		<flow-ref doc:name="health-claims-main-sublfow" doc:id="a4c98dab-acf3-4c45-bf3f-b0d9a1ab7b51" name="health-claims-main-sublfow" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="73ec0ec4-35ce-434c-a0d0-d0bb6b655321" when="#[error.errorType.namespace == 'HTTP']">
+				<logger level="INFO" doc:name="Logger" doc:id="2546e1d5-85fb-47d5-b32a-fb1a0a2b4070" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Error from Claims SYS - #[ error.description ]'/>
+				<ee:transform doc:name="Transform Message" doc:id="3f673b7f-2d3c-4cdd-8c01-7d41d9b34a9c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Claims Sys API is not Healthy",
+	message: false
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="936930e6-bbb0-4c4e-9180-eaa79feda626">
+				<logger level="INFO" doc:name="Logger" doc:id="f07ae7c4-f47b-4ece-9ee4-f1bc940c3351" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Error from Claims PROC - #[ error.description ]'/>
+				<ee:transform doc:name="Transform Message" doc:id="62f9c500-8374-489d-bb34-2e04d46f7051">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Claims Proc API is not Healthy",
+	message: false
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	
+</flow>
+	<sub-flow name="health-claims-main-sublfow" doc:id="9486b194-0720-4912-918a-8a5817bcbf5a"> 
+		<logger level="INFO" doc:name="Logger" doc:id="580aaba7-279d-40a7-95d0-35f4d1d3a983" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Request Received'/>
+		<set-variable value="#[correlationId]" doc:name="Set message_id with correlationId" doc:id="5992b3f3-5902-41ef-9399-22dbeed9c51b" variableName="message_id" />
+		<choice doc:name="Choice" doc:id="75aa37d0-3300-443c-bac2-bf7deeb8dd8b">
+			<when expression='#[lower(attributes.queryParams.downstream default "false" as String) == "true"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="352f4987-6ea0-442e-a1f5-8e72d54577fc" message="CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Calling downstream  &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;" />
+				<http:request method="GET" doc:name="Request" doc:id="eb4b0cce-d173-4eee-b39a-0fb93b4bbcaa" config-ref="HTTPS_Request_configuration" path="/health" sendCorrelationId="AUTO" correlationId="#[vars.message_id]">
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"downstream" : true
+}]]]></http:query-params>
+				</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="677d9e36-8c9a-40d4-9ac4-97c6e8c296d4" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Should be a valid Response &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;'/>
+				 
+			</when>
+			<otherwise>
+ 
+				<logger level="INFO" doc:name="Logger" doc:id="677d9e36-8c9a-40d4-9ac4-97c6e8c296d4" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Not calling downstream'/>
+			</otherwise>
+		</choice>
+		<choice doc:name="Choice" doc:id="b25e2ba0-05d7-499e-90a7-e06f39104b44">
+			<when expression="#[vars.claimsSys? and vars.claimsSys.success == false]">
+				<ee:transform doc:name="Not Healthy" doc:id="f1f9a876-1004-41e9-b3a4-b83f5d418f7a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:  "Claims Sys API is not healthy",
+	success: false
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Healthy" doc:id="564e0763-b178-41b3-8977-9b18651fdded">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Healthy",
+	success: true
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+
+</mule>

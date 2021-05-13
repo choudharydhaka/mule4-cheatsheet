@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="common-error-handler" doc:id="b4e50327-3b7c-4826-891a-7dd8ce226e0a" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2df44f24-436c-405d-a626-885ae5283fee" type="HTTP:NOT_FOUND">
+			<raise-error doc:name="Copy_of_Raise error" doc:id="34729c2b-2b4a-4bb2-88d0-bb8514b09c30" type="DHAKS:NOT_FOUND" description="Error Handler1 - On Continue - 404"/>
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b28b3df7-5cb7-47e5-97e0-139e9b8fad22" >
+			<raise-error doc:name="Copy_of_Copy_of_Raise error" doc:id="09a63735-ae1c-4530-ab82-78b9e1bb685a" type="DHAKS:ISE" description="Error Handler1 - On Propagate 500" />
+		</on-error-propagate>
+	</error-handler>
+	<error-handler name="api-error-handler" doc:id="961ba8e1-9110-47ea-8323-a36838959edc" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c29be289-fd61-44e5-8258-0e562df6af73">
+			<logger level="INFO" doc:name="Logger" doc:id="b9f94873-9c4d-401a-b864-42cfb71ce08b" message="CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Error handled in API Error Handler"/>
+			<ee:transform doc:name="Transform Message" doc:id="15dadded-3541-4146-bbab-abf5ef1567a4" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="errorResponse" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	handler1: error.detailedDescription,
+	handler2: "API Error Handler"
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

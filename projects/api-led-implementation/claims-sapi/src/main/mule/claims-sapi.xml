@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	 
+<flow name="claims-sapi-main" doc:id="69d4bb96-8da1-4e79-b885-97aedf00e963" >
+		<http:listener doc:name="/*" doc:id="2d91a0a5-e2ac-4866-9b29-ed3ecbb0ca38" config-ref="HTTP_Listener_config" path="/*">
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json ---  vars.errorResponse]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="10ea059a-120a-493c-b70d-8311186d9489" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] :  Request received - Health Check'/>
+		<ee:transform doc:name="Transform Message" doc:id="8ee7a7ec-f28d-44bd-a62c-b550f42772ae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Healthy",
+	success: true
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="api-error-handler" />
+	
+</flow>
+
+	<flow name="claims-sapi-propagate-main" doc:id="108f44be-0639-4b26-a3d6-9ee5af57c705" >
+		<http:listener doc:name="/p/*" doc:id="9c46aa8e-dcc3-4c24-8213-d476f7507f35" config-ref="HTTPS_Listener_config" path="/p/*">
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json ---  vars.errorResponse]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="0319c98f-7c13-42eb-8765-169b68c91437" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] :  Request received - Propagate #[attributes.queryParams.test ]'/>
+		<flow-ref doc:name="Flow Reference" doc:id="766d72ca-ec80-4fbf-9bac-3f9e6929e96c" name="claims-sapi-propagate-flow-ds"/>
+		<ee:transform doc:name="Transform Message" doc:id="2744a819-6149-4baa-8d36-d77b288b45d7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Healthy",
+	success: true
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="api-error-handler" />
+	
+</flow>
+	<flow name="claims-sapi-propagate-flow-ds" doc:id="224449c2-748d-466f-9738-bddd7dec6caa" >
+		<http:request method="GET" doc:name="Request" doc:id="6667c822-6b61-401e-aefc-025df399e9a9" config-ref="HTTP_Request_configuration" path="test">
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	id: attributes.queryParams.test default 1
+}]]]></http:query-params>
+		</http:request>
+		<error-handler ref="common-error-handler" />
+	</flow>
+	
+ 
+	
+	
+	
+	<flow name="claims-sapi-continue-main" doc:id="01cf9cac-3bb8-4b24-a34d-e2f09d7481c0" >
+		<http:listener doc:name="/c/*" doc:id="4c3ee890-a2a5-4b6e-9726-a139b8e813bd" config-ref="HTTPS_Listener_config" path="/c/*">
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json ---  vars.errorResponse]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="5541d1fd-b0c0-41e2-8f21-10ecaf165886" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] :  Request received - Continue #[attributes.queryParams.test ]'/>
+		<flow-ref doc:name="Flow Reference" doc:id="64ef3649-7749-45dc-bec1-0af5ed6ea99f" name="claims-sapi-continue-flow-ds"/>
+		<ee:transform doc:name="Transform Message" doc:id="d22bc3a5-05c4-4ee8-8c8e-fb28c356d9ab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Healthy",
+	success: true
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="api-error-handler" />
+	
+</flow>
+	<flow name="claims-sapi-continue-flow-ds" doc:id="e227d52d-03bc-4419-b366-c91a81b625e2" >
+		<http:request method="GET" doc:name="Request" doc:id="eb167666-404d-46cc-abee-17ec7f980559" config-ref="HTTP_Request_configuration" path="test">
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	id: attributes.queryParams.test default 1
+}]]]></http:query-params>
+		</http:request>
+		<error-handler ref="common-error-handler" />
+	</flow>
+	
+	
+	<flow name="downstream-api" doc:id="f0db4e18-f415-455d-a953-53876f057a72" >
+		<http:listener doc:name="/test" doc:id="e64e285f-0558-41f3-a229-77f6eb33425e" config-ref="HTTPS_Listener_config" path="/test">
+			<http:response statusCode="#[if (attributes.queryParams.'id' as Number == 1) 500 else 404]" />
+		</http:listener>
+		<logger level="INFO" doc:name="Log" doc:id="5e3bd16f-ab11-4fe3-95a3-2afc5b4bad53" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] :   Request received - Downstream API - #[attributes.queryParams.id ]' />
+		<ee:transform doc:name="Transform Message" doc:id="fb6cdb57-b59b-4248-9840-444980a2f122" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Status: if (attributes.queryParams.id== 1) "Error" else "Resource not found"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+
+</mule>
