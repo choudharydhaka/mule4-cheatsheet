@@ -3,6 +3,11 @@
   - [Object Store](./projects/object-store/Object-Store.md)
   - [Dataweave-2.0 Examples](./projects/Dataweave-2.0/)
   - [VM Queue](./projects/vm-cluster/Readme.md)
+  - [Claims API - Health Design Pattern](projects/api-led-implementation/README.md)
+  - [Object Store - CloudHub + OnPrim](projects/object-store/Object-Store.md)
+  - [RAML Components Learning](projects/RAML/README.md)
+  - [Mulesoft VM Queue](projects/vm-cluster/Readme.md)
+  - [Wiremock Mock Downstream APIs](projects/wiremock stubbing/README.md)
 - [Cloudhub](#Cloudhub)
 - [TLS with Mule4](#tls-with-mule4)
   * [Keytool](#keytool)
@@ -32,7 +37,13 @@ Here you can find the projects which has an example API running with concepts in
 |-|-|-|
 |Design API with Workbench| Workbench an Atom editor plugin allows us to design RAML specification |Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.|
 |How to use secure properties| Mule allows to encrypt any secrets|Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/secure-property)
-
+|Claims API| Demostrate how to use API led connectivty approach and implement health design pattern| Please Click [here](projects/api-led-implementation/README.md)
+|CLaims API| Demostrate how to use API led connectivty approach and implement health design pattern| Please Click [here](projects/api-led-implementation/README.md)
+|Dataweave-2.0 Examples| Usefull tips and tricks to learn Dataweave 2.0|Click [here](projects/Dataweave-2.0)|
+|Object Store| Anypoint Object Store behaviour details on both OnPrim and CloudHub| Click [here](projects/object-store/Object-Store.md)|
+|Raml Components|Allows you to utilize RAML components|Click [here](projects/RAML/README.md)
+|MuleSoft VM Queue| Demostration to use VM Queue with different use cases|Click [here](projects/vm-cluster/Readme.md)
+|Wiremock - Mocking APIs|Wiremock is a very lightweight tool based on java, which allows you to mock the downstream REST/SOAP Services both static and dynamically|Click [here](projects/wiremock stubbing/README.md)|
 # Cloudhub
 ## How to find IP address of a cloudhub worker
 Cloudhub provide logging facility, where it will log an entry for the ipaddress.
