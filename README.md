@@ -3,6 +3,11 @@
   - [Object Store](./projects/object-store/Object-Store.md)
   - [Dataweave-2.0 Examples](./projects/Dataweave-2.0/)
   - [VM Queue](./projects/vm-cluster/Readme.md)
+  - [Claims API - Health Design Pattern](projects/api-led-implementation/README.md)
+  - [Object Store - CloudHub + OnPrim](projects/object-store/Object-Store.md)
+  - [RAML Components Learning](projects/RAML/README.md)
+  - [Mulesoft VM Queue](projects/vm-cluster/Readme.md)
+  - [Wiremock Mock Downstream APIs](projects/wiremock-stubbing/README.md)
 - [Cloudhub](#Cloudhub)
 - [TLS with Mule4](#tls-with-mule4)
   * [Keytool](#keytool)
@@ -32,7 +37,13 @@ Here you can find the projects which has an example API running with concepts in
 |-|-|-|
 |Design API with Workbench| Workbench an Atom editor plugin allows us to design RAML specification |Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/health-check/demo-api) for a detailed step by step guidelines to design, develop and run an API.|
 |How to use secure properties| Mule allows to encrypt any secrets|Please click [here](https://github.com/choudharydhaka/mule4-cheatsheet/tree/master/projects/secure-property)
-
+|Claims API| Demostrate how to use API led connectivty approach and implement health design pattern| Please Click [here](projects/api-led-implementation/README.md)
+|CLaims API| Demostrate how to use API led connectivty approach and implement health design pattern| Please Click [here](projects/api-led-implementation/README.md)
+|Dataweave-2.0 Examples| Usefull tips and tricks to learn Dataweave 2.0|Click [here](projects/Dataweave-2.0)|
+|Object Store| Anypoint Object Store behaviour details on both OnPrim and CloudHub| Click [here](projects/object-store/Object-Store.md)|
+|Raml Components|Allows you to utilize RAML components|Click [here](projects/RAML/README.md)
+|MuleSoft VM Queue| Demostration to use VM Queue with different use cases|Click [here](projects/vm-cluster/Readme.md)
+|Wiremock - Mocking APIs|Wiremock is a very lightweight tool based on java, which allows you to mock the downstream REST/SOAP Services both static and dynamically|Click [here](projects/wiremock-stubbing/README.md)|
 # Cloudhub
 ## How to find IP address of a cloudhub worker
 Cloudhub provide logging facility, where it will log an entry for the ipaddress.
@@ -277,3 +288,73 @@ public class Convertor {
 }
 
 ```
+
+# Performance
+
+## Enable Native Memrory Tracking 
+Allows to understand the momery allocation for Runtime tunning.
+
+```sh
+# Pass below param as and argument
+-XX:NativeMemoryTracking=summary
+#get Java Process ID
+$ jps -m
+# 20552 MuleContainerBootstrap -M-Dmule.forceConsoleLog -M-Dmule.testingMode -M-XX:NativeMemoryTracking summary -M-XX:-UseBiasedLocking -M-Dfile.encoding UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication
+
+# Get native and total memory reserved
+$ jcmd 20552 VM.native_memory |grep -e "Native\|Total"
+Native Memory Tracking:
+Total: reserved=2608288KB, committed=1343532KB
+-    Native Memory Tracking (reserved=4738KB, committed=4738KB)
+
+$ jstack -l 20552 > /c/tmp/mydump.out
+``` 
+ 
+# 0.1 vCore in Anypoint Studio
+```sh
+-M-XX:NativeMemoryTracking=summary -Xmx490m
+-Xms490m
+-M-XX:MaxDirectMemorySize=32m
+```
+
+Worker Size	DirectMemorySize, MiB
+0.1 vCore	32
+0.2 vCore	128
+1 vCore	512
+
+## References
+- https://help.mulesoft.com/s/article/Application-Deployed-to-a-Fractional-vCore-Worker-in-CloudHub-Throws-java-lang-OutOfMemoryError-Direct-buffer-memory
+
+## Transform module in the application
+Module allocates 1.5 MiB of a memory buffer from Direct Memory native allocation. You may need to think about the intense requests leads to a restart where Heap Memory is not an issue, its Native memory allocation.
+
+## Tools:
+- jps : Get java process
+- jCMD 
+- visualvm
+
+# Logging
+Logging is very important, it utilize CPU consumption and one log file has a certain size.
+## Use Case 1
+A payload with size 15 MB is called, Now if any one print the entire payload 10 times, you may endup creating an API call into 10 files, which makes hard to track any issue if occured, Also the unnecessary computation.
+
+Cloudhub log file size: 10 mb
+soap msg size -> 10mb
+logger * 10 => produce logs files 10, and cpu overhead to print the payload, challeniging to troupleshoot the issue.
+
+# Capacity Planning
+Capacity planning has mainly two criteria -
+- Payload size
+- processing intensity
+Also, think about the fractional vCores, how does it work with CloudHub.
+> 0.2*5 -> don't consume cpu -> fractional vCores -> doesn't utilize cpu.
+
+- Small payload -> processing takes very little time -> message rate is intesnse -> 0.2x5 is better option -> if you don't consumes the cpu, you would have more processing threads
+
+- If large payload with lower rate -> better to use 1 vcore worker
+
+## OnPrim - Application Ready OnPrim
+Resource Allocation 
+-	linux -> process and thread both are equal
+-	CPU Core
+-	Mem

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	 
+	
+	<flow name="TLS-claims-api-flow" doc:id="e7c7d9eb-05a5-4ef3-a9a9-007dc7ede2a8">
+		<http:listener doc:name="/*" doc:id="b8064113-f254-41b8-9983-964b08c77ca6" config-ref="HTTP_Listener_config" path="/*" />
+		<flow-ref doc:name="health-main-sub-flow" doc:id="1eb7d0b8-58ef-4803-827d-735c8cbbeb76" name="health-main-sub-flow" />
+	</flow>
+	<flow name="NON-TLS-claims-api-flow" doc:id="08f202a2-2417-4fb8-a0d0-8d8326c14f81">
+		<http:listener doc:name="/*" doc:id="4e6bef89-4850-40a8-8801-d4608ebf9355" config-ref="HTTPS_Listener_config" path="/*" />
+		<flow-ref doc:name="health-main-sub-flow" doc:id="7469382e-b03c-4c2f-b407-89c817fe532a" name="health-main-sub-flow" />
+	</flow>
+	<sub-flow name="health-main-sub-flow" doc:id="0a26e5d6-8dfd-4a57-8605-2dd2c74d030e" >
+		<logger level="DEBUG" doc:name="Logger" doc:id="993e25d2-3fee-4984-b29e-93eb9bc14434" message="#[output application/json --- {correlationId:correlationId, Application: app.name, Flow: flow.name,a: attributes, p: payload}]" />
+		<logger level="INFO" doc:name="Logger" doc:id="c44ba1b7-7413-431b-a513-ddf075f56acb" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Request Received - Health Check'/>
+		<choice doc:name="Choice" doc:id="c1249a5b-c18b-4eb6-ab73-bc3b7582889f">
+			<when expression="#[lower(attributes.queryParams.'downstream' default 'false') == &quot;true&quot;]">
+				<flow-ref doc:name="claims-proc-api-downstream-subflow" doc:id="be0f9827-7f24-4e98-a62d-46ab3971ad5c" name="health-claims-proc-api-downstream-subflow" target="claimsProc" />
+			</when>
+		</choice>
+		<choice doc:name="Choice" doc:id="b05ab69a-f7c5-46ad-b3f3-d02061e4d2c7">
+			<when expression="#[vars.claimsProc? and vars.claimsProc.success == false]">
+				<ee:transform doc:name="Not Healthy" doc:id="a431ac6a-9885-4d32-8242-319daf2c0ce6">
+			<ee:message>
+			</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="health"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:  vars.claimsProc.message,
+	success: false
+	
+}]]></ee:set-variable>
+					</ee:variables>
+		
+</ee:transform>
+			
+</when>
+			<otherwise>
+				<ee:transform doc:name="Healthy" doc:id="cb96fb35-5e33-4995-9390-7f593c147fc5">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="health"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:  "Healthy",
+	success: true
+	
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		
+</choice>
+		<flow-ref doc:name="health-claims-api-response-subflow" doc:id="7c7f3e52-43f5-4be2-95b7-7c96d83f38d2" name="health-claims-api-response-subflow" />
+	</sub-flow>
+	<sub-flow name="health-claims-proc-api-downstream-subflow" doc:id="f75ea9ec-50ae-4091-8315-012f069bf11f" >
+	
+		<logger level="INFO" doc:name="Logger" doc:id="fd360984-4fd7-4999-bbcc-622e8d13b7f2" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Calling downstream &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;'/> 
+		 
+		<try doc:name="Try" doc:id="485c7635-f002-4a6e-915c-e8b0acba3e0d" >
+		<http:request method="GET" doc:name="Request" doc:id="8c981913-34fe-4bc8-99da-09497bad1696" config-ref="HTTPS_Request_configuration" path="/health" sendCorrelationId="AUTO"    >
+				<http:query-params ><![CDATA[#[output application/java
+---
+{
+	downstream : "true"
+}]]]></http:query-params>
+			</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="14267e8f-d0e9-41f2-a7f3-9a230537b6fa" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] : Should be a valid response  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;'/> 
+			
+			<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7e766b91-bd22-4db1-a407-3291032d642c" when="#[error.errorType.namespace == 'HTTP']">
+			<logger level="INFO" doc:name="Logger" doc:id="b58bc2f9-af95-4b54-bbde-cd867d4be5ec" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] :Error from downstream - #[error.description]'/> 
+				 
+					<ee:transform doc:name="Transform Message" doc:id="41cd85b9-5415-4071-ae5c-0dd5b67d5812" >
+					<ee:message >
+					</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="health" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: error.errorMessage.payload.message,
+	message: false
+	
+}]]></ee:set-variable>
+						</ee:variables>
+				
+</ee:transform>
+					<flow-ref doc:name="health-claims-api-response-subflow" doc:id="6e739f1a-ea37-4396-b2b9-ac17fb212edf" name="health-claims-api-response-subflow"/>
+			
+</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4644b491-1f01-4c46-aabe-52909fb3283d">
+				<logger level="INFO" doc:name="Logger" doc:id="bedf6040-4703-46c7-9361-62755fa822eb" message='CorrelationId [ #[correlationId]] :  Application [ #[app.name]] : Flow [ #[flow.name]] :Error from Claims API - #[error.description]'/> 
+			 
+					<ee:transform doc:name="Transform Message" doc:id="6fb5dd7c-ff3e-4197-b3ef-c2d9c61c5d24">
+					<ee:message>
+					</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="health" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Claims API is not Healthy",
+	message: false
+	
+}]]></ee:set-variable>
+						</ee:variables>
+				
+</ee:transform>
+					<flow-ref doc:name="health-claims-api-response-subflow" doc:id="e0a43618-3b21-4e2a-8ff3-c34ab5dbbd15" name="health-claims-api-response-subflow"/>
+			
+</on-error-continue>
+		</error-handler>
+		</try>
+		 
+	</sub-flow>
+	<sub-flow name="health-claims-api-response-subflow" doc:id="59a0cf71-aad3-469a-8fd7-126f0c52bfc0" >
+	<logger level="DEBUG" doc:name="Logger" doc:id="1e7ed5b1-9ef9-42eb-bac7-c768b447823a" message="#[output application/json --- {correlationId:correlationId, Application: app.name, Flow: flow.name,a: attributes, p: vars.health}]" />
+		
+		<choice doc:name="Choice" doc:id="a5f7f47a-7868-4723-ac5a-a35d4fbc3ca0" >
+			<when expression="#[vars.health.message? and vars.health.message == false]">
+				<ee:transform doc:name="Healthy" doc:id="71547441-d62b-4de6-82b2-6b288430452b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: vars.claimsProc.message,
+	success: false
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Healthy" doc:id="8ebb8bbc-f1fb-46e4-a1d4-e12be24069c5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:  "Healthy",
+	success: true
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

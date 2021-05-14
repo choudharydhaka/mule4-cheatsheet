@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<http:listener-config name="HTTPS_Listener_config" doc:name="HTTP Listener config" doc:id="15218e59-9eda-4fb9-98d6-804cd3283a93" basePath="${api.base}">
+		<http:listener-connection host="${api.host}" port="${api.tls.port}" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store type="jks" path="${tls.store}" alias="${tls.crt.name}" keyPassword="${tls.crt.pass}" password="${tls.pass}" />
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1414b94f-dab3-4208-979f-870fdaa21e25" basePath="${api.base}">
+		<http:listener-connection host="${api.host}" port="${api.port}" protocol="HTTP"/>
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="c77fc580-88d8-4272-ab9d-741ec11f7529" file="config-${MULE.ENV}.yaml" />
+	<http:request-config name="HTTPS_Request_configuration" doc:name="HTTP Request configuration" doc:id="1865b9a8-2c20-4f04-a6bb-8dacc4768b04" basePath="${claims-sys.base}" >
+		<http:request-connection protocol="${claims-sys.protocol}" host="${claims-sys.host}" port="${claims-sys.port}" />
+	</http:request-config>
+	
+ 
+</mule>

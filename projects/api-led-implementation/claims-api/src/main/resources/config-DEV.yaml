@@ -1,0 +1,19 @@
+api:
+  host: "127.0.0.1"
+  port: "8081"
+  base: /api
+  tls:
+    port: "8082"
+
+tls:
+  store: mule.jks
+  pass: changeit
+  crt:
+    name: server-crt
+    pass: password
+
+claims-proc:
+  protocol: HTTP
+  host: localhost
+  port: "8083"
+  base: /api
