@@ -288,3 +288,73 @@ public class Convertor {
 }
 
 ```
+
+# Performance
+
+## Enable Native Memrory Tracking 
+Allows to understand the momery allocation for Runtime tunning.
+
+```sh
+# Pass below param as and argument
+-XX:NativeMemoryTracking=summary
+#get Java Process ID
+$ jps -m
+# 20552 MuleContainerBootstrap -M-Dmule.forceConsoleLog -M-Dmule.testingMode -M-XX:NativeMemoryTracking summary -M-XX:-UseBiasedLocking -M-Dfile.encoding UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication
+
+# Get native and total memory reserved
+$ jcmd 20552 VM.native_memory |grep -e "Native\|Total"
+Native Memory Tracking:
+Total: reserved=2608288KB, committed=1343532KB
+-    Native Memory Tracking (reserved=4738KB, committed=4738KB)
+
+$ jstack -l 20552 > /c/tmp/mydump.out
+``` 
+ 
+# 0.1 vCore in Anypoint Studio
+```sh
+-M-XX:NativeMemoryTracking=summary -Xmx490m
+-Xms490m
+-M-XX:MaxDirectMemorySize=32m
+```
+
+Worker Size	DirectMemorySize, MiB
+0.1 vCore	32
+0.2 vCore	128
+1 vCore	512
+
+## References
+- https://help.mulesoft.com/s/article/Application-Deployed-to-a-Fractional-vCore-Worker-in-CloudHub-Throws-java-lang-OutOfMemoryError-Direct-buffer-memory
+
+## Transform module in the application
+Module allocates 1.5 MiB of a memory buffer from Direct Memory native allocation. You may need to think about the intense requests leads to a restart where Heap Memory is not an issue, its Native memory allocation.
+
+## Tools:
+- jps : Get java process
+- jCMD 
+- visualvm
+
+# Logging
+Logging is very important, it utilize CPU consumption and one log file has a certain size.
+## Use Case 1
+A payload with size 15 MB is called, Now if any one print the entire payload 10 times, you may endup creating an API call into 10 files, which makes hard to track any issue if occured, Also the unnecessary computation.
+
+Cloudhub log file size: 10 mb
+soap msg size -> 10mb
+logger * 10 => produce logs files 10, and cpu overhead to print the payload, challeniging to troupleshoot the issue.
+
+# Capacity Planning
+Capacity planning has mainly two criteria -
+- Payload size
+- processing intensity
+Also, think about the fractional vCores, how does it work with CloudHub.
+> 0.2*5 -> don't consume cpu -> fractional vCores -> doesn't utilize cpu.
+
+- Small payload -> processing takes very little time -> message rate is intesnse -> 0.2x5 is better option -> if you don't consumes the cpu, you would have more processing threads
+
+- If large payload with lower rate -> better to use 1 vcore worker
+
+## OnPrim - Application Ready OnPrim
+Resource Allocation 
+-	linux -> process and thread both are equal
+-	CPU Core
+-	Mem
