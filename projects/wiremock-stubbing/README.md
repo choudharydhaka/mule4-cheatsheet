@@ -14,7 +14,20 @@
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-
+# Prerequisite
+Please make sure all the request goes to endpoint **POST localhost:8081/__admin/mappings**
+```
+POST localhost:8081/__admin/mappings
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/query"
+    },
+    "response": {
+        "status": 200
+    }
+}
+```
 
 ## URL matching
 ```
