@@ -310,17 +310,33 @@ Total: reserved=2608288KB, committed=1343532KB
 $ jstack -l 20552 > /c/tmp/mydump.out
 ``` 
  
-# 0.1 vCore in Anypoint Studio
+# 0.1 vCore in Anypoint Studio VM arguments
 ```sh
--M-XX:NativeMemoryTracking=summary -Xmx490m
--Xms490m
--M-XX:MaxDirectMemorySize=32m
+-XX:NativeMemoryTracking=summary 
+-Xmx490m 
+-Xms490m 
+-XX:ReservedCodeCacheSize=64m 
+-XX:MaxDirectMemorySize=32m 
+-M-XX:MaxMetaspaceSize=256m   
 ```
 
-Worker Size	DirectMemorySize, MiB
-0.1 vCore	32
-0.2 vCore	128
-1 vCore	512
+# 0.2 vCore in Anypoint Studio VM arguments
+```sh
+-XX:NativeMemoryTracking=summary 
+-Xmx960m 
+-Xms960m 
+-XX:ReservedCodeCacheSize=240m 
+-XX:MaxDirectMemorySize=128m 
+-XX:MaxMetaspaceSize=256m
+```
+
+ 
+
+|Worker Size|	DirectMemorySize, MiB|Heap|Non Heap|
+|-|-|-|-|
+|0.1 vCore|	32| 490|490
+|0.2 vCore|	128|960|960
+|1vCore|512|1.5/2 GB|1.5/2 GB
 
 ## References
 - https://help.mulesoft.com/s/article/Application-Deployed-to-a-Fractional-vCore-Worker-in-CloudHub-Throws-java-lang-OutOfMemoryError-Direct-buffer-memory
