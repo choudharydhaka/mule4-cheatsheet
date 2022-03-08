@@ -109,6 +109,63 @@ Sometimes it's helpful to check ssl communication to debug the issues, Mule4 all
 ```
 -M-Djavax.net.debug=ssl
 ```
+## Network testing
+```sh
+nc -zv -w timeout host port
+```
+Example:
+```sh
+$ nc -zv -w 10 sahasrar.co.nz 80
+Ncat: Version 7.50 ( https://nmap.org/ncat )
+Ncat: Connected to 172.67.135.2:80.
+```
+If you are using a Proxy:
+```sh
+nc -x <proxy>:<port> -X connect -zv -w 10 host port
+```
+Example:
+```sh
+$ nc -x 127.0.0.1:8080 -X connect  -zv -w 10 sahasrar.co.nz 443
+```
+nc: Proxy error: "HTTP/1.1 200 Connection established"
+
+### Telnet
+In case the nc command is not available you could use the telnet command. If you see an output similar to the one below it means there is connectivity.
+#### Syntax:
+```sh
+telnet <host> <port>
+```
+Example:
+```sh
+$ telnet sahasrar.co.nz 80
+Trying 104.21.6.159...
+Connected to sahasrar.co.nz.
+```
+If the connection is not successful you could see an error similar to this:
+
+```sh
+$ telnet localhost 1234
+Trying 127.0.0.1...
+telnet: connect to address 127.0.0.1: Connection refused
+telnet: Unable to connect to remote host
+```
+Needless to say, the nc command is more convenient for testing connectivity.
+ 
+### Ping
+One of the most common tools for testing connectivity is the ping command. Unfortunately it has some limitations mentioned below that limit its usefulness.
+
+#### Syntax:
+```sh
+ping <host>
+``
+Example:
+```
+$ ping sahasrar.co.nz
+PING sahasrar.co.nz (104.21.6.159) 56(84) bytes of data.
+64 bytes from 104.21.6.159 (104.21.6.159): icmp_seq=1 ttl=57 time=31.2 ms
+```
+
+
 
 ## sed, a stream editor
 Sed is a linux command to help to subtitute values of any file. I'm using to comment out enableProtocols to enforce TLSv1.2 in tls-default.conf file in Mule4 runtime. please click [here](https://www.gnu.org/software/sed/manual/sed.html) for official documents.
@@ -374,3 +431,7 @@ Resource Allocation
 -	linux -> process and thread both are equal
 -	CPU Core
 -	Mem
+
+
+## References
+- https://help.mulesoft.com/s/article/Network-connectivity-testing
