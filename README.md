@@ -157,9 +157,9 @@ One of the most common tools for testing connectivity is the ping command. Unfor
 #### Syntax:
 ```sh
 ping <host>
-``
-Example:
 ```
+Example:
+```sh
 $ ping sahasrar.co.nz
 PING sahasrar.co.nz (104.21.6.159) 56(84) bytes of data.
 64 bytes from 104.21.6.159 (104.21.6.159): icmp_seq=1 ttl=57 time=31.2 ms
