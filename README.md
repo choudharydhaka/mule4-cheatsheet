@@ -386,14 +386,23 @@ $ jstack -l 20552 > /c/tmp/mydump.out
 -XX:MaxDirectMemorySize=128m 
 -XX:MaxMetaspaceSize=256m
 ```
-
- 
+# 1 vCore in Anypoint Studio VM arguments
+```sh
+-XX:NativeMemoryTracking=summary 
+-Xmx1500m
+-Xms1000m
+-XX:ReservedCodeCacheSize=240m 
+-XX:MaxDirectMemorySize=512m 
+-XX:MaxMetaspaceSize=256m
+ ```
 
 |Worker Size|	DirectMemorySize, MiB|Heap|Non Heap|
 |-|-|-|-|
 |0.1 vCore|	32| 490|490
 |0.2 vCore|	128|960|960
 |1vCore|512|1.5/2 GB|1.5/2 GB
+
+> The metaspace limit for apps deployed to CloudHub is currently 256 MB, regardless of the worker size. The initial metaspace size is 128 MB; metaspace garbage collection begins after the metaspace reaches that threshold.
 
 ## References
 - https://help.mulesoft.com/s/article/Application-Deployed-to-a-Fractional-vCore-Worker-in-CloudHub-Throws-java-lang-OutOfMemoryError-Direct-buffer-memory
