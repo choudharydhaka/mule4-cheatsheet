@@ -374,7 +374,7 @@ $ jstack -l 20552 > /c/tmp/mydump.out
 -Xms490m 
 -XX:ReservedCodeCacheSize=64m 
 -XX:MaxDirectMemorySize=32m 
--M-XX:MaxMetaspaceSize=256m   
+-XX:MaxMetaspaceSize=256m   
 ```
 
 # 0.2 vCore in Anypoint Studio VM arguments
