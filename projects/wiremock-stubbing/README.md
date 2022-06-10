@@ -28,6 +28,52 @@ POST localhost:8081/__admin/mappings
     }
 }
 ```
+## URI Path in resposne
+- urlPathPattern
+- **{{request.path.[3]}}**
+- "fixedDelayMilliseconds": 2000
+```
+{  
+    "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v1/enrolments/.*"
+				 
+    },
+	"response": {
+        "status": 200,
+		"headers": {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache"
+        },
+         
+           "fixedDelayMilliseconds": 2000,
+           "body": "{ \"id\": \"{{request.query.identifier}}\"}"
+	}
+}
+```
+## Query Path in resposne
+- urlPathPattern
+- **{{request.path.[3]}}**
+- "fixedDelayMilliseconds": 2000
+```
+{  
+    "request": {
+        "method": "GET",
+        "urlPathPattern": "/api/v1/enrolments\\?identifier=.*"
+				 
+    },
+	"response": {
+        "status": 200,
+		"headers": {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache"
+        },
+         
+           "fixedDelayMilliseconds": 2000,
+           "body": "{ \"id\": \"{{request.query.identifier}}\"}"
+	}
+}
+```
 
 ## URL matching
 ```
