@@ -74,6 +74,32 @@ POST localhost:8081/__admin/mappings
 	}
 }
 ```
+## Body Matching
+- bodyPatterns
+```json
+{  
+    "request": {
+        "method": "POST",
+        "urlPattern": "/api/v1/orders"
+		,
+       	"bodyPatterns" : [ {
+            "matchesJsonPath" : {
+                "expression": "$.description",
+                "contains": "Order to suspend Enrolment"
+            }
+    } ]				  
+    },
+	"response": {
+        "status": 201,
+		"headers": {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache"
+        },
+           "fixedDelayMilliseconds": {{delay}},
+        "body":  "{ \"success\" : true, \"orderNumber\" : \"O-00124355\", \"accountNumber\" : \"{{jsonPath request.body '$.existingAccountNumber'}}\", \"status\" : \"Completed\", \"subscriptionNumbers\" : [ \"{{jsonPath request.body '$.subscriptions[0].subscriptionNumber'}}\" ]}"
+	}
+}
+```
 
 ## URL matching
 ```
@@ -380,3 +406,5 @@ sequenceDiagram
 
 :::
 ```
+# References
+- https://wiremock.org/docs/request-matching/
